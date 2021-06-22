@@ -1,12 +1,12 @@
-[submodule "Engine/vendor/spdlog"]
-	path = Engine/vendor/spdlog
+[submodule "Voxel/vendor/spdlog"]
+	path = Voxel/vendor/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "Engine/vendor/glfw"]
-	path = Engine/vendor/glfw
+[submodule "Voxel/vendor/glfw"]
+	path = Voxel/vendor/glfw
 	url = https://github.com/RealGreyCode/glfw
-[submodule "Engine/vendor/ImGui"]
-	path = Engine/vendor/ImGui
+[submodule "Voxel/vendor/ImGui"]
+	path = Voxel/vendor/ImGui
 	url = https://github.com/RealGreyCode/ImGui
-[submodule "Engine/vendor/glm"]
-	path = Engine/vendor/glm
+[submodule "Voxel/vendor/glm"]
+	path = Voxel/vendor/glm
 	url = https://github.com/g-truc/glm
