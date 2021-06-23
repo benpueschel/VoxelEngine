@@ -80,10 +80,13 @@ public:
 
 		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
 
-		std::stringstream frameTime;
-		frameTime << "Frame Time: " << m_FrameTime;
-		ImGui::Text(frameTime.str().c_str());
+		ImGui::Text("Camera Position: %f %f %f",
+			m_CameraController.GetCamera().GetTransform().GetPosition().x,
+			m_CameraController.GetCamera().GetTransform().GetPosition().y,
+			m_CameraController.GetCamera().GetTransform().GetPosition().z
+		);
 
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
 
@@ -123,14 +126,9 @@ public:
 private:
 
 	ShaderLibrary m_ShaderLibrary;
-
-	glm::vec3 m_CameraPosition = { 0, 0, 0 };
-	glm::vec3 m_CameraRotation = { 0, 0, 0.001f };
-
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 
 	OrthographicCameraController m_CameraController;
-	//PerspectiveCamera m_Camera;
 
 	Ref<VertexArray> m_SquareVA;
 
