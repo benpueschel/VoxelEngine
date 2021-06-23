@@ -155,7 +155,10 @@ namespace Voxel {
 		}
 
 		for (auto shader : glShaders)
+		{
 			glDetachShader(program, shader);
+			glDeleteShader(shader);
+		}
 
 		m_RendererID = program;
 	}
