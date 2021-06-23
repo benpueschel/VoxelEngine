@@ -1,6 +1,7 @@
 #include <pch.h>
 #include "Voxel.h"
 
+
 #include "Voxel/ImGui/ImGuiLayer.h"
 #include <ImGui/imgui.h>
 
@@ -18,7 +19,7 @@ class RenderLayer : public Layer
 {
 public:
 
-	RenderLayer() : Layer("RenderLayer"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_ShaderLibrary()
+	RenderLayer() : Layer("RenderLayer"), m_CameraController(16.0f / 9.0f), m_ShaderLibrary()
 	{
 
 		m_SquareVA = VertexArray::Create();
@@ -70,20 +71,7 @@ public:
 	void OnDetach() override {}
 	void OnEvent(Event& event) override
 	{
-		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(RenderLayer::OnWindowResize));
-	}
-
-	bool OnWindowResize(WindowResizeEvent& event)
-	{
-
-		float w = (float)event.GetWidth() / 1000.0f;
-		float h = (float)event.GetHeight() / 1000.0f;
-
-		LOG_DEBUG("Window Resize: {0}/{1}", w, h);
-
-		m_Camera.RecalculateProjectionMatrix(-w, w, -h, h);
-		return false;
+		m_CameraController.OnEvent(event);
 	}
 
 	void OnImGuiRender() override
@@ -102,29 +90,11 @@ public:
 	void OnUpdate(Timestep timestep) override
 	{
 
+		m_CameraController.OnUpdate(timestep);
+
 		m_FrameTime = timestep * 1000;
 
-		float cameraSpeed = 2 * timestep;
-		float cameraRotationSpeed = 90 * timestep;
-
-		if (Input::IsKeyPressed(KeyCode::KEY_W))
-			m_CameraPosition.y += cameraSpeed;
-		if (Input::IsKeyPressed(KeyCode::KEY_S))
-			m_CameraPosition.y -= cameraSpeed;
-		if (Input::IsKeyPressed(KeyCode::KEY_A))
-			m_CameraPosition.x -= cameraSpeed;
-		if (Input::IsKeyPressed(KeyCode::KEY_D))
-			m_CameraPosition.x += cameraSpeed;
-
-		if (Input::IsKeyPressed(KeyCode::KEY_Q))
-			m_CameraRotation.y += cameraRotationSpeed;
-		if (Input::IsKeyPressed(KeyCode::KEY_E))
-			m_CameraRotation.y -= cameraRotationSpeed;
-
-		m_Camera.SetPosition(m_CameraPosition);
-		m_Camera.SetRotation(m_CameraRotation);
-
-		Renderer::BeginScene(m_Camera);
+		Renderer::BeginScene(m_CameraController.GetCamera());
 
 		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -159,7 +129,7 @@ private:
 
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 
-	OrthographicCamera m_Camera;
+	OrthographicCameraController m_CameraController;
 	//PerspectiveCamera m_Camera;
 
 	Ref<VertexArray> m_SquareVA;
