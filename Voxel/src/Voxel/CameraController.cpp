@@ -46,13 +46,8 @@ namespace Voxel {
 
 	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& event)
 	{
-
-		LOG_CORE_DEBUG("{0}", m_ZoomLevel);
-
 		m_ZoomLevel -= event.GetYOffset() * 0.25f;
 		m_ZoomLevel = glm::max(0.1f, m_ZoomLevel);
-
-		LOG_CORE_WARN("{0}", m_ZoomLevel);
 
 		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 
