@@ -26,11 +26,6 @@ project "Sandbox"
 	filter "system:windows"
 		systemversion "latest"
 
-		defines {
-			"PLATFORM_WINDOWS",
-			"GLFW_INCLUDE_NONE"
-		}
-
 	filter "configurations:Debug"
 		defines {
 			"VOXEL_DEBUG",

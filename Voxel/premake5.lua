@@ -45,7 +45,7 @@ project "Voxel"
 		systemversion "latest"
 
 		defines {
-			"PLATFORM_WINDOWS",
+			"VOXEL_BUILD_DLL",
 			"GLFW_INCLUDE_NONE"
 		}
 

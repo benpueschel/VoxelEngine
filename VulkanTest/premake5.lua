@@ -27,10 +27,7 @@ project "VulkanTest"
 	filter "system:windows"
 		systemversion "latest"
 
-		defines {
-			"PLATFORM_WINDOWS",
-			"GLFW_INCLUDE_VULKAN"
-		}
+		defines "GLFW_INCLUDE_VULKAN"
 
 	filter "configurations:Debug"
 		defines {
