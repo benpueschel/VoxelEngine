@@ -31,7 +31,6 @@
 #include "Voxel/Rendering/Materials/Texture.h"
 
 #include "Voxel/Rendering/Camera/OrthographicCamera.h"
-#include "Voxel/Rendering/Camera/PerspectiveCamera.h"
 
 // ----------------- Im Gui -----------------
 

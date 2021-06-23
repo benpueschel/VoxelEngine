@@ -18,7 +18,7 @@ namespace Voxel {
 		void OnUpdate(Timestep& timestep);
 		void OnEvent(Event& event);
 
-		const Camera& GetCamera() const { return m_Camera; }
+		Camera& GetCamera() { return m_Camera; }
 
 		float GetZoomLevel() { return m_ZoomLevel; }
 		void SetZoomLevel(float zoomLevel) { m_ZoomLevel = zoomLevel; }
@@ -29,11 +29,7 @@ namespace Voxel {
 
 	private:
 		float m_AspectRatio;
-
 		float m_ZoomLevel = 1.0f;
-		glm::vec3 m_Rotation = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
-
 		OrthographicCamera m_Camera;
 	};
 

@@ -16,22 +16,28 @@ namespace Voxel {
 		float cameraSpeed = 2 * timestep * m_ZoomLevel * 0.5f;
 		float cameraRotationSpeed = 90 * timestep * m_ZoomLevel * 0.5f;
 
+		glm::vec3 move = glm::vec3(0.0f);
+
 		if (Input::IsKeyPressed(KeyCode::KEY_W))
-			m_Position.y += cameraSpeed;
+			move += m_Camera.GetTransform().Forward();
 		if (Input::IsKeyPressed(KeyCode::KEY_S))
-			m_Position.y -= cameraSpeed;
+			move -= m_Camera.GetTransform().Forward();
 		if (Input::IsKeyPressed(KeyCode::KEY_A))
-			m_Position.x -= cameraSpeed;
+			move -= m_Camera.GetTransform().Right();
 		if (Input::IsKeyPressed(KeyCode::KEY_D))
-			m_Position.x += cameraSpeed;
+			move += m_Camera.GetTransform().Right();
 
 		if (Input::IsKeyPressed(KeyCode::KEY_Q))
-			m_Rotation.y += cameraRotationSpeed;
+			m_Camera.Rotate({ 0, cameraRotationSpeed, 0 });
 		if (Input::IsKeyPressed(KeyCode::KEY_E))
-			m_Rotation.y -= cameraRotationSpeed;
+			m_Camera.Rotate({ 0, -cameraRotationSpeed, 0 });
 
-		m_Camera.SetPosition(m_Position);
-		m_Camera.SetRotation(m_Rotation);
+		move *= cameraSpeed;
+		LOG_CORE_DEBUG("{0}, {1}, {2}", move.x, move.y, move.z);
+
+		move += m_Camera.GetTransform().GetPosition();
+
+		m_Camera.SetPosition(move);
 
 		m_Camera.RecalculateViewMatrix();
 	}
