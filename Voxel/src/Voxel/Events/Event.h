@@ -12,9 +12,13 @@ namespace Voxel {
 	enum class EventType
 	{
 		None = 0,
-		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
+		WindowClose, WindowResize, WindowFramebufferResize, WindowFocus, WindowLostFocus, WindowMoved, 
+		WindowMinimized, WindowRestored, WindowMaximized,
+
 		AppTick, AppUpdate, AppRender,
+
 		KeyPressed, KeyReleased, KeyTyped,
+
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 

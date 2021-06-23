@@ -5,6 +5,8 @@
 
 #include "Shaders/Shader.h"
 
+#include "Voxel/Events/ApplicationEvent.h"
+
 namespace Voxel {
 
 	class Renderer
@@ -12,8 +14,9 @@ namespace Voxel {
 	public:
 
 		static void Init();
+		static void OnWindowFramebufferResize(WindowFramebufferResizeEvent& event);
 
-		static void BeginScene(Camera& camera);
+		static void BeginScene(const Camera& camera);
 		static void EndScene();
 
 		static void Submit(

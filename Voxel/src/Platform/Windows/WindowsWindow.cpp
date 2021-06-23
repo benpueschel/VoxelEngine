@@ -38,6 +38,8 @@ namespace Voxel {
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
+		m_Data.Maximized = false;
+		m_Data.Minimized = false;
 
 		LOG_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
@@ -48,9 +50,6 @@ namespace Voxel {
 
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
-
-		// TODO: Remove as this is only necessary for Vulkan
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 		m_Window = glfwCreateWindow(props.Width, props.Height, m_Data.Title.c_str(), NULL, NULL);
 
@@ -72,7 +71,17 @@ namespace Voxel {
 			WindowResizeEvent event(width, height);
 			data.EventCallback(event);
 
-			});
+		});
+
+		glfwSetFramebufferSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) {
+
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			data.Width = width;
+			data.Height = height;
+
+			WindowFramebufferResizeEvent event(width, height);
+			data.EventCallback(event);
+		});
 
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window) {
 
@@ -80,7 +89,7 @@ namespace Voxel {
 
 			WindowCloseEvent event;
 			data.EventCallback(event);
-			});
+		});
 
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 
@@ -88,29 +97,29 @@ namespace Voxel {
 
 			switch (action)
 			{
-			case GLFW_PRESS:
-			{
-				KeyPressedEvent event(static_cast<KeyCode>(key), 0);
-				data.EventCallback(event);
-				break;
-			}
-			case GLFW_RELEASE:
-			{
-				KeyReleasedEvent event(static_cast<KeyCode>(key));
-				data.EventCallback(event);
-				break;
-			}
-			case GLFW_REPEAT:
-			{
-				KeyPressedEvent event(static_cast<KeyCode>(key), 1);
-				data.EventCallback(event);
-				break;
-			}
+				case GLFW_PRESS:
+				{
+					KeyPressedEvent event(static_cast<KeyCode>(key), 0);
+					data.EventCallback(event);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					KeyReleasedEvent event(static_cast<KeyCode>(key));
+					data.EventCallback(event);
+					break;
+				}
+				case GLFW_REPEAT:
+				{
+					KeyPressedEvent event(static_cast<KeyCode>(key), 1);
+					data.EventCallback(event);
+					break;
+				}
 			default:
 				break;
 			}
 
-			});
+		});
 
 		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int key) {
 
@@ -119,7 +128,7 @@ namespace Voxel {
 			KeyTypedEvent event(static_cast<KeyCode>(key));
 			data.EventCallback(event);
 
-			});
+		});
 
 		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods) {
 
@@ -127,22 +136,22 @@ namespace Voxel {
 
 			switch (action)
 			{
-			case GLFW_PRESS:
-			{
-				MouseButtonPressedEvent event(static_cast<MouseButton>(button));
-				data.EventCallback(event);
-				break;
-			}
-			case GLFW_RELEASE:
-			{
-				MouseButtonReleasedEvent event(static_cast<MouseButton>(button));
-				data.EventCallback(event);
-				break;
-			}
+				case GLFW_PRESS:
+				{
+					MouseButtonPressedEvent event(static_cast<MouseButton>(button));
+					data.EventCallback(event);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					MouseButtonReleasedEvent event(static_cast<MouseButton>(button));
+					data.EventCallback(event);
+					break;
+				}
 			default:
 				break;
 			}
-			});
+		});
 
 		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset) {
 
@@ -157,7 +166,29 @@ namespace Voxel {
 
 			MouseMovedEvent event((float)x, (float)y);
 			data.EventCallback(event);
-			});
+		});
+
+		glfwSetWindowIconifyCallback(m_Window, [](GLFWwindow* window, int minimized) {
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			data.Minimized = minimized;
+			data.Maximized = false;
+
+			if (minimized == GLFW_TRUE)
+				data.EventCallback(WindowMinimizeEvent());
+			else
+				data.EventCallback(WindowRestoreEvent());
+		});
+
+		glfwSetWindowMaximizeCallback(m_Window, [](GLFWwindow* window, int maximized) {
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			data.Maximized = maximized;
+			data.Minimized = false;
+
+			if (maximized == GLFW_TRUE)
+				data.EventCallback(WindowMaximizeEvent());
+			else
+				data.EventCallback(WindowRestoreEvent());
+		});
 
 	}
 
@@ -183,5 +214,31 @@ namespace Voxel {
 	}
 
 	bool WindowsWindow::IsVSync() const { return m_Data.VSync; }
+
+	void WindowsWindow::SetMinimized(bool minimized)
+	{
+		if (minimized)
+			glfwIconifyWindow(m_Window);
+		else
+			glfwRestoreWindow(m_Window);
+
+		m_Data.Maximized = false;
+		m_Data.Minimized = minimized;
+	}
+
+	bool WindowsWindow::IsMinimized() const { return m_Data.Minimized; }
+
+	void WindowsWindow::SetMaximized(bool maximized)
+	{
+		if (maximized)
+			glfwMaximizeWindow(m_Window);
+		else
+			glfwRestoreWindow(m_Window);
+
+		m_Data.Minimized = false;
+		m_Data.Maximized = maximized;
+	}
+
+	bool WindowsWindow::IsMaximized() const { return m_Data.Maximized; }
 
 }

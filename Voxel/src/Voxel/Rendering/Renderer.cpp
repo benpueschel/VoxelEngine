@@ -15,8 +15,13 @@ namespace Voxel {
 		RenderCommand::Init();
 	}
 
+	void Renderer::OnWindowFramebufferResize(WindowFramebufferResizeEvent& event)
+	{
+		RenderCommand::SetViewport({ 0, 0, event.GetWidth(), event.GetHeight() });
+	}
 
-	void Renderer::BeginScene(Camera& camera)
+
+	void Renderer::BeginScene(const Camera& camera)
 	{
 		m_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 	}

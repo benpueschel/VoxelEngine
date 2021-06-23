@@ -28,6 +28,57 @@ namespace Voxel {
 		unsigned int m_Width, m_Height;
 	};
 
+	class WindowFramebufferResizeEvent : public Event
+	{
+	public:
+		WindowFramebufferResizeEvent(unsigned int width, unsigned int height)
+			: m_Width(width), m_Height(height)
+		{
+		}
+
+		unsigned int GetWidth() const { return m_Width; }
+		unsigned int GetHeight() const { return m_Height; }
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "WindowFramebufferResizeEvent: " << m_Width << ", " << m_Height;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(WindowFramebufferResize)
+			EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	private:
+		unsigned int m_Width, m_Height;
+	};
+
+	class WindowMinimizeEvent : public Event
+	{
+	public:
+		WindowMinimizeEvent() = default;
+
+		EVENT_CLASS_TYPE(WindowMinimized)
+			EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
+	class WindowMaximizeEvent : public Event
+	{
+	public:
+		WindowMaximizeEvent() = default;
+
+		EVENT_CLASS_TYPE(WindowMaximized)
+			EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
+	class WindowRestoreEvent : public Event
+	{
+	public:
+		WindowRestoreEvent() = default;
+
+		EVENT_CLASS_TYPE(WindowRestored)
+			EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
 	class WindowCloseEvent : public Event
 	{
 	public:

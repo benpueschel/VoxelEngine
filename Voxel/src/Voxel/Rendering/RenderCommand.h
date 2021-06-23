@@ -14,6 +14,11 @@ namespace Voxel {
 			s_RenderAPI->Init();
 		}
 
+		inline static void SetViewport(glm::ivec4 dimensions)
+		{
+			s_RenderAPI->SetViewport(dimensions);
+		}
+
 		inline static void SetClearColor(const glm::vec4& color)
 		{
 			s_RenderAPI->SetClearColor(color);

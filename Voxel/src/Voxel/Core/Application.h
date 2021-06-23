@@ -33,6 +33,7 @@ namespace Voxel {
 		inline Window& GetWindow() { return *m_Window; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& event);
+		bool OnWindowFramebufferResize(WindowFramebufferResizeEvent& event);
 
 		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;

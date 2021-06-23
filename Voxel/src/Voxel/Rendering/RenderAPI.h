@@ -19,6 +19,7 @@ namespace Voxel {
 	public:
 
 		virtual void Init() = 0;
+		virtual void SetViewport(glm::ivec4 dimensions) = 0;
 		virtual void SetClearColor(const glm::vec4& color) = 0;
 		virtual void Clear() = 0;
 

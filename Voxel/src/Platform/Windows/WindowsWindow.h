@@ -22,6 +22,10 @@ namespace Voxel {
 		void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
+		void SetMinimized(bool minimized) override;
+		bool IsMinimized() const override;
+		void SetMaximized(bool maximized) override;
+		bool IsMaximized() const override;
 
 		virtual void* GetNativeWindow() const { return m_Window; }
 	private:
@@ -36,6 +40,8 @@ namespace Voxel {
 			std::string Title;
 			unsigned int Width, Height;
 			bool VSync;
+			bool Minimized;
+			bool Maximized;
 
 			EventCallbackFn EventCallback;
 		};

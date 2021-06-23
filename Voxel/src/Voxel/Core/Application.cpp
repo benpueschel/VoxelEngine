@@ -45,6 +45,7 @@ namespace Voxel {
 		EventDispatcher dispatcher(event);
 
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
+		dispatcher.Dispatch<WindowFramebufferResizeEvent>(BIND_EVENT_FN(Application::OnWindowFramebufferResize));
 
 		//LOG_CORE_DEBUG("{0}", event);
 
@@ -63,6 +64,15 @@ namespace Voxel {
 		return true;
 	}
 
+	bool Application::OnWindowFramebufferResize(WindowFramebufferResizeEvent& event)
+	{
+		if (m_Window->IsMinimized())
+			return false;
+
+		Renderer::OnWindowFramebufferResize(event);
+		return false;
+	}
+
 	void Application::Run()
 	{
 		while (m_Running)
@@ -75,8 +85,11 @@ namespace Voxel {
 			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 			RenderCommand::Clear();
 
-			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(m_Timestep);
+			if (!m_Window->IsMinimized())
+			{
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(m_Timestep);
+			}
 
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
