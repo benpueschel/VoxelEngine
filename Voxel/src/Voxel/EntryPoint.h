@@ -6,28 +6,21 @@ extern Voxel::Application* Voxel::CreateApplication();
 
 int main(int argc, char** argv)
 {
+	Voxel::Logger::Init();
 
-	try
-	{
+	LOG_CORE_INFO("Creating Engine Application");
 
-		Voxel::Logger::Init();
+	PROFILE_BEGIN_SESSION("Startup", "VoxelProfile-Startup.json");
+	auto app = Voxel::CreateApplication();
+	PROFILE_END_SESSION();
 
-		LOG_CORE_INFO("Creating Engine Application");
+	PROFILE_BEGIN_SESSION("Runtime", "VoxelProfile-Runtime.json");
+	app->Run();
+	PROFILE_END_SESSION();
 
-		auto app = Voxel::CreateApplication();
-
-		app->Run();
-
-		delete app;
-
-	}
-	catch (std::exception* exception)
-	{
-		LOG_CORE_FATAL(exception->what());
-		return 1;
-	}
-
-	return 0;
+	PROFILE_BEGIN_SESSION("Shutdown", "VoxelProfile-Shutdown.json");
+	delete app;
+	PROFILE_END_SESSION();
 }
 
 #endif

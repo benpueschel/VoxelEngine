@@ -19,6 +19,7 @@ namespace Voxel {
 		// Primitive Submitting
 		static void DrawQuad(Transform& transform, const glm::vec4& color); 
 		static void DrawQuad(Transform& transform, const Ref<Texture2D>& texture);
+		static void DrawQuad(Transform& transform, const Ref<Texture2D>& texture, const glm::vec4& color);
 	};
 
 }

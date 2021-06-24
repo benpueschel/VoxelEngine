@@ -13,6 +13,7 @@ namespace Voxel {
 
 	void OrthographicCameraController::OnUpdate(Timestep& timestep)
 	{
+		PROFILE_FUNCTION();
 		float cameraSpeed = 2 * timestep * m_ZoomLevel * 0.5f;
 		float cameraRotationSpeed = 90 * timestep * m_ZoomLevel * 0.5f;
 
@@ -42,12 +43,8 @@ namespace Voxel {
 			m_Camera.Rotate({ 0, 0, -cameraRotationSpeed });
 
 		move *= cameraSpeed;
-		LOG_CORE_DEBUG("{0}, {1}, {2}", move.x, move.y, move.z);
 
-		move += m_Camera.GetTransform().GetPosition();
-
-		m_Camera.SetPosition(move);
-
+		m_Camera.SetPosition(move + m_Camera.GetTransform().GetPosition());
 		m_Camera.RecalculateViewMatrix();
 	}
 
@@ -61,6 +58,7 @@ namespace Voxel {
 
 	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& event)
 	{
+		PROFILE_FUNCTION();
 		m_ZoomLevel -= event.GetYOffset() * 0.25f;
 		m_ZoomLevel = glm::max(0.1f, m_ZoomLevel);
 
@@ -71,6 +69,7 @@ namespace Voxel {
 
 	bool OrthographicCameraController::OnWindowResized(WindowResizeEvent& event)
 	{
+		PROFILE_FUNCTION();
 		m_AspectRatio = (float) event.GetWidth() / (float) event.GetHeight();
 		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
 		return false;

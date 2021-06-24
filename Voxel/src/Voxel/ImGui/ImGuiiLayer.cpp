@@ -25,6 +25,7 @@ namespace Voxel {
 
 	void ImGuiLayer::OnAttach()
 	{
+		PROFILE_FUNCTION();
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -54,6 +55,8 @@ namespace Voxel {
 
 	void ImGuiLayer::OnDetach()
 	{
+		PROFILE_FUNCTION();
+
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
@@ -61,6 +64,8 @@ namespace Voxel {
 
 	void ImGuiLayer::Begin()
 	{
+		PROFILE_FUNCTION();
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -68,6 +73,8 @@ namespace Voxel {
 
 	void ImGuiLayer::End()
 	{
+		PROFILE_FUNCTION();
+
 		ImGuiIO& io = ImGui::GetIO();
 		Window& window = Application::Get().GetWindow();
 		io.DisplaySize = ImVec2((float)window.GetWidth(), (float)window.GetHeight());
@@ -88,8 +95,7 @@ namespace Voxel {
 
 	void ImGuiLayer::OnImGuiRender()
 	{
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
+
 	}
 
 }

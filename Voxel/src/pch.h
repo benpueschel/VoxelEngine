@@ -16,7 +16,8 @@
 
 #include "Voxel/Core/Core.h"
 #include "Voxel/Logging/Logger.h"
+#include "Voxel/Debug/Instrumentor.h"
 
-#ifdef PLATFORM_WINDOWS
-#include <Windows.h>
+#ifdef VOXEL_PLATFORM_WINDOWS
+	#include <Windows.h>
 #endif

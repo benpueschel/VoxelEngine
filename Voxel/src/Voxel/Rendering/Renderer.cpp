@@ -10,17 +10,23 @@ namespace Voxel {
 
 	void Renderer::Init()
 	{
+		PROFILE_FUNCTION();
+
 		RenderCommand::Init();
 		Renderer2D::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
+		PROFILE_FUNCTION();
+
 		Renderer2D::Shutdown();
 	}
 
 	void Renderer::OnWindowFramebufferResize(WindowFramebufferResizeEvent& event)
 	{
+		PROFILE_FUNCTION();
+
 		RenderCommand::SetViewport({ 0, 0, event.GetWidth(), event.GetHeight() });
 	}
 

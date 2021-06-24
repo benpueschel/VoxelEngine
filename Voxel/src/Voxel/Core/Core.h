@@ -5,6 +5,8 @@
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
+#define VOXEL_PROFILE 1
+
 #ifdef _WIN32
 	#ifdef _WIN64
 		#define VOXEL_PLATFORM_WINDOWS

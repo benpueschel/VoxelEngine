@@ -12,6 +12,8 @@ namespace Voxel {
 
 	Application::Application()
 	{
+		PROFILE_FUNCTION();
+
 		CORE_ASSERT(!s_Instance, "Singleton-class Application already exists");
 		s_Instance = this;
 
@@ -27,23 +29,30 @@ namespace Voxel {
 
 	Application::~Application()
 	{
+		PROFILE_FUNCTION();
+
 		Renderer::Shutdown();
 	}
 
 	void Application::PushLayer(Layer* layer)
 	{
+		PROFILE_FUNCTION();
+
 		m_LayerStack.PushLayer(layer);
 		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer)
 	{
+		PROFILE_FUNCTION();
+
 		m_LayerStack.PushOverlay(layer);
 		layer->OnAttach();
 	}
 
 	void Application::OnEvent(Event& event)
 	{
+		PROFILE_FUNCTION();
 
 		EventDispatcher dispatcher(event);
 
@@ -63,12 +72,14 @@ namespace Voxel {
 
 	bool Application::OnWindowClose(WindowCloseEvent& event)
 	{
+		PROFILE_FUNCTION();
 		m_Running = false;
 		return true;
 	}
 
 	bool Application::OnWindowFramebufferResize(WindowFramebufferResizeEvent& event)
 	{
+		PROFILE_FUNCTION();
 		if (m_Window->IsMinimized())
 			return false;
 
@@ -78,8 +89,11 @@ namespace Voxel {
 
 	void Application::Run()
 	{
+		PROFILE_FUNCTION();
+
 		while (m_Running)
 		{
+			PROFILE_SCOPE("Application RunLoop");
 
 			float time = (float)glfwGetTime();
 			float deltaTime = time - m_LastFrameTime;
@@ -90,14 +104,22 @@ namespace Voxel {
 
 			if (!m_Window->IsMinimized())
 			{
-				for (Layer* layer : m_LayerStack)
-					layer->OnUpdate(m_Timestep);
-			}
+				{
+					PROFILE_SCOPE("Layer Updating");
 
-			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_LayerStack)
-				layer->OnImGuiRender();
-			m_ImGuiLayer->End();
+					for (Layer* layer : m_LayerStack)
+						layer->OnUpdate(m_Timestep);
+				}
+
+				{
+					PROFILE_SCOPE("ImGui Rendering");
+
+					m_ImGuiLayer->Begin();
+					for (Layer* layer : m_LayerStack)
+						layer->OnImGuiRender();
+					m_ImGuiLayer->End();
+				}
+			}
 
 			m_Window->OnUpdate();
 

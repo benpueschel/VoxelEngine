@@ -9,7 +9,6 @@ namespace Voxel {
 
 	Ref<VertexArray> VertexArray::Create()
 	{
-
 		switch (Renderer::GetAPI())
 		{
 			case RenderAPI::API::OpenGL: 

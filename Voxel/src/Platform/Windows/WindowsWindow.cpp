@@ -25,16 +25,22 @@ namespace Voxel {
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		PROFILE_FUNCTION();
+
 		Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
+		PROFILE_FUNCTION();
+
 		Shutdown();
 	}
 
 	void WindowsWindow::Init(const WindowProps& props)
 	{
+		PROFILE_FUNCTION();
+
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
@@ -45,6 +51,7 @@ namespace Voxel {
 
 		if (!s_GLFWInitialized)
 		{
+			PROFILE_SCOPE("glfwInit");
 			CORE_ASSERT(glfwInit(), "Could not initialize GLFW");
 			s_GLFWInitialized = true;
 
@@ -52,15 +59,16 @@ namespace Voxel {
 		}
 
 		glfwWindowHint(GLFW_SAMPLES, 4);
-
-		m_Window = glfwCreateWindow(props.Width, props.Height, m_Data.Title.c_str(), NULL, NULL);
-
+		{
+			PROFILE_SCOPE("glfwCreateWindow");
+			m_Window = glfwCreateWindow(props.Width, props.Height, m_Data.Title.c_str(), NULL, NULL);
+		}
 		// TODO: Automatically Create Window context
 		m_Context = CreateScope<OpenGLContext>(m_Window);
 		m_Context->Init();;
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
-		SetVSync(true);
+		SetVSync(false);
 
 		// SET GLFW CALLBACKS
 
@@ -196,12 +204,16 @@ namespace Voxel {
 
 	void WindowsWindow::Shutdown()
 	{
+		PROFILE_FUNCTION();
+
 		m_Context->Destroy();
 		glfwDestroyWindow(m_Window);
 	}
 
 	void WindowsWindow::OnUpdate()
 	{
+		PROFILE_FUNCTION();
+
 		glfwPollEvents();
 
 		m_Context->SwapBuffers();
@@ -210,6 +222,8 @@ namespace Voxel {
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{
+		PROFILE_FUNCTION();
+
 		glfwSwapInterval(enabled ? 1 : 0);
 
 		m_Data.VSync = enabled;

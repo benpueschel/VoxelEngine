@@ -23,6 +23,8 @@ namespace Voxel {
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 		: m_Name(name)
 	{
+		PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> shaderSources;
 
 		shaderSources[GL_VERTEX_SHADER] = vertexSrc;
@@ -33,6 +35,8 @@ namespace Voxel {
 
 	OpenGLShader::OpenGLShader(const std::filesystem::path& path)
 	{
+		PROFILE_FUNCTION();
+
 		std::string source = ReadFile(path);
 		auto shaderSources = Preprocess(source);
 		Compile(shaderSources);
@@ -43,6 +47,8 @@ namespace Voxel {
 
 	std::string OpenGLShader::ReadFile(const std::filesystem::path& path)
 	{
+		PROFILE_FUNCTION();
+
 		std::string result;
 		std::ifstream in(path, std::ios::in | std::ios::binary);
 
@@ -63,6 +69,8 @@ namespace Voxel {
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::Preprocess(const std::string& source)
 	{
+		PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> shaderSources;
 
 		const char* typeToken = "#type";
@@ -91,6 +99,8 @@ namespace Voxel {
 
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
+		PROFILE_FUNCTION();
+
 		GLuint program = glCreateProgram();
 
 		CORE_ASSERT((bool)(shaderSources.size() <= 2), "Shader '" + m_Name + "' exceeds the maximum of 2 programs");
@@ -167,11 +177,15 @@ namespace Voxel {
 
 	OpenGLShader::~OpenGLShader()
 	{
+		PROFILE_FUNCTION();
+
 		glDeleteProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Bind() const
 	{
+		PROFILE_FUNCTION();
+
 		glUseProgram(m_RendererID);
 	}
 
