@@ -1,17 +1,14 @@
 #include <pch.h>
 #include "Voxel.h"
-
+#include "Voxel/EntryPoint.h"
 
 #include "Voxel/ImGui/ImGuiLayer.h"
 #include <ImGui/imgui.h>
 
-#include <stdio.h>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "Platform/OpenGL/Shaders/OpenGLShader.h"
-
 #include <glm/gtc/type_ptr.hpp>
-#include <sstream>
+
+#include "Sandbox2D.h"
 
 using namespace Voxel;
 
@@ -48,21 +45,14 @@ public:
 		squareIB->Unbind();
 		m_SquareVA->SetIndexBuffer(squareIB);
 
-		//auto colorShader = m_ShaderLibrary.LoadShader("assets/shaders/ColorShader.glsl");
-		//auto textureShader = m_ShaderLibrary.LoadShader("assets/shaders/TextureShader.glsl");
-
-		auto colorShader = Shader::Create("assets/shaders/ColorShader.glsl");
-		auto textureShader = Shader::Create("assets/shaders/TextureShader.glsl");
-
-		m_ShaderLibrary.AddShader(colorShader);
-		m_ShaderLibrary.AddShader(textureShader);
+		auto FlatColorShader = m_ShaderLibrary.LoadShader("assets/shaders/ColorShader.glsl");
+		auto TextureShader = m_ShaderLibrary.LoadShader("assets/shaders/TextureShader.glsl");
 
 		//m_Texture = Texture2D::Create("assets/textures/Checkerboard.png");
 		m_Texture = Texture2D::Create("assets/textures/ChernoLogo.png");
 
-		textureShader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
-
+		TextureShader->Bind();
+		TextureShader->SetInt("u_Texture", 0);
 	}
 
 	~RenderLayer() {}
@@ -90,34 +80,29 @@ public:
 		ImGui::End();
 	}
 
-	void OnUpdate(Timestep timestep) override
+	void OnUpdate(Timestep& timestep) override
 	{
-
 		m_CameraController.OnUpdate(timestep);
-
-		m_FrameTime = timestep * 1000;
 
 		Renderer::BeginScene(m_CameraController.GetCamera());
 
-		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
-
-		auto colorShader = m_ShaderLibrary.GetShader("ColorShader");
-
-		colorShader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(colorShader)->UploadUniformFloat4("u_Color", m_SquareColor);
+		auto FlatColorShader = m_ShaderLibrary.GetShader("ColorShader");
+		FlatColorShader->Bind();
+		FlatColorShader->SetFloat4("u_Color", m_SquareColor);
 
 		for (int y = 0; y < 20; y++)
 		{
 			for (int x = 0; x < 20; x++)
 			{
-				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
-				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos - glm::vec3(1.0f)) * scale;
-				Renderer::Submit(colorShader, m_SquareVA, transform);
+				Transform transform;
+				transform.SetScale(glm::vec3(0.1f));
+				transform.SetPosition({ x * 0.11f, y * 0.11f, 0.0f });
+				Renderer::Submit(FlatColorShader, m_SquareVA, transform);
 			}
 		}
 
 		m_Texture->Bind();
-		Renderer::Submit(m_ShaderLibrary.GetShader("TextureShader"), m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Renderer::Submit(m_ShaderLibrary.GetShader("TextureShader"), m_SquareVA);
 
 
 		Renderer::EndScene();
@@ -134,8 +119,6 @@ private:
 
 	Ref<Texture2D> m_Texture;
 
-	float m_FrameTime = 0;
-
 };
 
 class Sandbox : public Application
@@ -144,10 +127,9 @@ class Sandbox : public Application
 public:
 	Sandbox()
 	{
-
 		LOG_INFO("Sandbox Application loading");
-		PushLayer(new RenderLayer());
-
+		//PushLayer(new RenderLayer());
+		PushLayer(new Sandbox2D());
 	}
 
 	~Sandbox()

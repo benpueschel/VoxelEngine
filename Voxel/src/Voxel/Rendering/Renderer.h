@@ -12,8 +12,9 @@ namespace Voxel {
 	class Renderer
 	{
 	public:
-
 		static void Init();
+		static void Shutdown();
+
 		static void OnWindowFramebufferResize(WindowFramebufferResizeEvent& event);
 
 		static void BeginScene(const Camera& camera);
@@ -22,7 +23,7 @@ namespace Voxel {
 		static void Submit(
 			const Ref<Shader>& shader,
 			const Ref<VertexArray>& vertexArray,
-			const glm::mat4& transform = glm::mat4(1.0f)
+			Transform& = Transform()
 		);
 
 		inline static RenderAPI::API GetAPI() { return RenderAPI::GetAPI(); }
@@ -33,7 +34,7 @@ namespace Voxel {
 			glm::mat4 ViewProjectionMatrix;
 		};
 
-		static Scope<SceneData> m_SceneData;
+		static Scope<SceneData> s_SceneData;
 
 	};
 

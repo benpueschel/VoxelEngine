@@ -15,5 +15,5 @@ public:
 	void OnEvent(Event& event) override;
 
 	void OnImGuiRender() override;
-	void OnUpdate(Timestep timestep) override;
+	void OnUpdate(Timestep& timestep) override;
 };

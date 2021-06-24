@@ -31,7 +31,7 @@ void VulkanRenderLayer::OnImGuiRender()
 
 }
 
-void VulkanRenderLayer::OnUpdate(Timestep timestep)
+void VulkanRenderLayer::OnUpdate(Timestep& timestep)
 {
 
 }

@@ -24,6 +24,8 @@
 #include "Voxel/Rendering/Renderer.h"
 #include "Voxel/Rendering/RenderCommand.h"
 
+#include "Voxel/Rendering/2D/Renderer2D.h"
+
 #include "Voxel/Rendering/Shaders/Shader.h"
 #include "Voxel/Rendering/Shaders/VertexArray.h"
 #include "Voxel/Rendering/Shaders/Buffer.h"
@@ -35,9 +37,3 @@
 // ----------------- Im Gui -----------------
 
 #include "Voxel/ImGui/ImGuiLayer.h"
-
-// --------------- Entry Point --------------
-
-#include "Voxel/EntryPoint.h"
-
-// ------------------------------------------

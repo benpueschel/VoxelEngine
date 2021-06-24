@@ -51,6 +51,8 @@ namespace Voxel {
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
+		glfwWindowHint(GLFW_SAMPLES, 4);
+
 		m_Window = glfwCreateWindow(props.Width, props.Height, m_Data.Title.c_str(), NULL, NULL);
 
 		// TODO: Automatically Create Window context

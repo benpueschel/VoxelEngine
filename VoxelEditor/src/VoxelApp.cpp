@@ -1,5 +1,6 @@
 #include <pch.h>
 #include "Voxel.h"
+#include "Voxel/EntryPoint.h"
 
 //#include "EditorLayer.h"
 

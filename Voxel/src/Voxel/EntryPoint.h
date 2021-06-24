@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef PLATFORM_WINDOWS
+#ifdef VOXEL_PLATFORM_WINDOWS
 
 extern Voxel::Application* Voxel::CreateApplication();
 

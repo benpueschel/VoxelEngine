@@ -15,7 +15,7 @@ namespace Voxel {
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate(Timestep timestep) {}
+		virtual void OnUpdate(Timestep& timestep) {}
 		virtual void OnEvent(Event& event) {}
 
 		virtual void OnImGuiRender() {}

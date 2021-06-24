@@ -1,6 +1,5 @@
-#define GLFW_INCLUDE_VULKAN
-
 #include "Voxel.h"
+#include "Voxel/EntryPoint.h"
 
 #include "VulkanRenderLayer.h"
 

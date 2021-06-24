@@ -18,12 +18,12 @@ namespace Voxel {
 
 	glm::vec3 Transform::Forward()
 	{
-		return Rotate({ 1, 0, 0 }, m_Rotation);
+		return Rotate({ 0, 0, 1 }, m_Rotation);
 	}
 
 	glm::vec3 Transform::Right()
 	{
-		return Rotate({ 0, 0, 1 }, m_Rotation);
+		return Rotate({ 1, 0, 0 }, m_Rotation);
 	}
 
 	glm::vec3 Transform::Top()
@@ -36,7 +36,12 @@ namespace Voxel {
 		if (rotation == glm::vec3(0.0f))
 			return vector;
 
-		return glm::rotate(vector, glm::radians(glm::length(rotation)), glm::normalize(rotation));
+		glm::vec3 rotatedVector = vector;
+		rotatedVector = glm::rotateX(rotatedVector, glm::radians(rotation.x));
+		rotatedVector = glm::rotateY(rotatedVector, glm::radians(rotation.y));
+		rotatedVector = glm::rotateZ(rotatedVector, glm::radians(rotation.z));
+
+		return rotatedVector;
 	}
 
 	glm::mat4 Transform::Rotate(const glm::mat4& matrix, const glm::vec3& rotation)

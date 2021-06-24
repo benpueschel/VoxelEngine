@@ -18,19 +18,28 @@ namespace Voxel {
 
 		glm::vec3 move = glm::vec3(0.0f);
 
-		if (Input::IsKeyPressed(KeyCode::KEY_W))
+		/*if (Input::IsKeyPressed(KeyCode::KEY_W))
 			move += m_Camera.GetTransform().Forward();
 		if (Input::IsKeyPressed(KeyCode::KEY_S))
 			move -= m_Camera.GetTransform().Forward();
 		if (Input::IsKeyPressed(KeyCode::KEY_A))
 			move -= m_Camera.GetTransform().Right();
 		if (Input::IsKeyPressed(KeyCode::KEY_D))
+			move += m_Camera.GetTransform().Right();*/
+		
+		if (Input::IsKeyPressed(KeyCode::KEY_W))
+			move += m_Camera.GetTransform().Top();
+		if (Input::IsKeyPressed(KeyCode::KEY_S))
+			move -= m_Camera.GetTransform().Top();
+		if (Input::IsKeyPressed(KeyCode::KEY_A))
+			move -= m_Camera.GetTransform().Right();
+		if (Input::IsKeyPressed(KeyCode::KEY_D))
 			move += m_Camera.GetTransform().Right();
 
 		if (Input::IsKeyPressed(KeyCode::KEY_Q))
-			m_Camera.Rotate({ 0, cameraRotationSpeed, 0 });
+			m_Camera.Rotate({ 0, 0, cameraRotationSpeed });
 		if (Input::IsKeyPressed(KeyCode::KEY_E))
-			m_Camera.Rotate({ 0, -cameraRotationSpeed, 0 });
+			m_Camera.Rotate({ 0, 0, -cameraRotationSpeed });
 
 		move *= cameraSpeed;
 		LOG_CORE_DEBUG("{0}, {1}, {2}", move.x, move.y, move.z);
