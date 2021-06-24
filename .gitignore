@@ -44,3 +44,4 @@ bin-int/
 
 !vendor/premake/bin/
 !vendor/premake/bin/premake5.exe
+**/imgui.ini
