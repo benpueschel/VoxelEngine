@@ -15,6 +15,9 @@ namespace Voxel {
 		virtual uint32_t GetWidth() const override { return m_Width; }
 		virtual uint32_t GetHeight() const override { return m_Height; }
 
+		virtual void SetWrapMode(const TextureWrapMode& wrapMode) const override;
+		virtual void SetFilterMode(const TextureFilterMode& filterMode) const override;
+
 		virtual void Bind(uint32_t slot) const override;
 
 	private:
