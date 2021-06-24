@@ -9,6 +9,8 @@ namespace Voxel {
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	void OpenGLRenderAPI::SetViewport(glm::ivec4 dimensions)
@@ -28,9 +30,7 @@ namespace Voxel {
 
 	void OpenGLRenderAPI::DrawIndexed(const Ref<VertexArray>& vertexArray)
 	{
-
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-
 	}
 
 }
