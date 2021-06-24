@@ -2,7 +2,7 @@ include "./vendor/premake/premake_customization/solution_items.lua"
 include "Dependencies.lua"
 
 workspace "VoxelEngine"
-	architecture "x64"
+	architecture "x86_64"
 	startproject "Sandbox"
 
 	configurations {
