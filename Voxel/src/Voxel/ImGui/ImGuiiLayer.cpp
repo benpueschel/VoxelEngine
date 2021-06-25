@@ -98,4 +98,8 @@ namespace Voxel {
 
 	}
 
+	void ImGuiLayer::OnEvent(Event& event)
+	{
+	}
+
 }

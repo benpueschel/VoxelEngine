@@ -26,8 +26,8 @@ namespace Voxel {
 		return Rotate({ 1, 0, 0 }, m_Rotation);
 	}
 
-	glm::vec3 Transform::Top()
-	{
+	glm::vec3 Transform::Up()
+{
 		return Rotate({ 0, 1, 0 }, m_Rotation);
 	}
 

@@ -1,19 +1,17 @@
-#include <pch.h>
 #include "Voxel.h"
 #include "Voxel/EntryPoint.h"
 
-//#include "EditorLayer.h"
+#include "EditorLayer.h"
 
 namespace Voxel {
-
-	using namespace Voxel;
 
 	class Voxel : public Application
 	{
 	public:
 		Voxel()
+			: Application("VoxelEditor")
 		{
-			//PushLayer(new EditorLayer());
+			PushLayer(new EditorLayer());
 		}
 
 		~Voxel()

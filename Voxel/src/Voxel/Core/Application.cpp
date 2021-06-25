@@ -10,14 +10,14 @@ namespace Voxel {
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
+	Application::Application(const std::string& name)
 	{
 		PROFILE_FUNCTION();
 
 		CORE_ASSERT(!s_Instance, "Singleton-class Application already exists");
 		s_Instance = this;
 
-		m_Window = Scope<Window>(Window::Create());
+		m_Window = Scope<Window>(Window::Create({ name }));
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
@@ -48,6 +48,11 @@ namespace Voxel {
 
 		m_LayerStack.PushOverlay(layer);
 		layer->OnAttach();
+	}
+
+	void Application::Close()
+	{
+		m_Running = false;
 	}
 
 	void Application::OnEvent(Event& event)
@@ -98,9 +103,6 @@ namespace Voxel {
 			float time = (float)glfwGetTime();
 			float deltaTime = time - m_LastFrameTime;
 			m_Timestep = { time, deltaTime };
-
-			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-			RenderCommand::Clear();
 
 			if (!m_Window->IsMinimized())
 			{

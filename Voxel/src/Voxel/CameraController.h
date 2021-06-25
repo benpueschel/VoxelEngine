@@ -18,6 +18,8 @@ namespace Voxel {
 		void OnUpdate(Timestep& timestep);
 		void OnEvent(Event& event);
 
+		void OnResize(float width, float height);
+
 		OrthographicCamera& GetCamera() { return m_Camera; }
 
 		float GetZoomLevel() { return m_ZoomLevel; }

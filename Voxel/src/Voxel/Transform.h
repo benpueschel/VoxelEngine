@@ -8,7 +8,7 @@ namespace Voxel {
 	{
 	public:
 		Transform();
-
+		// TODO: Only optimize the matrix at the end of every frame, as it will be redundant when calling 2 methods in the same frame.
 		void SetPosition(const glm::vec3& position)
 		{
 			m_Position = position;
@@ -24,6 +24,10 @@ namespace Voxel {
 			m_Scale = scale;
 			RecalculateMatrix();
 		}
+		void Rotate(const glm::vec3& rotation)
+		{
+			SetRotation(GetRotation() + rotation);
+		}
 
 		glm::vec3& GetPosition() { return m_Position; }
 		glm::vec3& GetRotation() { return m_Rotation; }
@@ -32,7 +36,7 @@ namespace Voxel {
 
 		glm::vec3 Forward();
 		glm::vec3 Right();
-		glm::vec3 Top();
+		glm::vec3 Up();
 
 		static glm::vec3 Rotate(const glm::vec3& vector, const glm::vec3& rotation);
 		static glm::mat4 Rotate(const glm::mat4& vector, const glm::vec3& rotation);

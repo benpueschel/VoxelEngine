@@ -20,7 +20,7 @@ namespace Voxel {
 	class Application
 	{
 	public:
-		Application();
+		Application(const std::string& name = "Voxel Engine");
 		virtual ~Application();
 
 		void Run();
@@ -28,6 +28,8 @@ namespace Voxel {
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
+
+		void Close();
 
 		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window; }

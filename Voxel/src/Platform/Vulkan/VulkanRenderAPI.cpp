@@ -23,7 +23,7 @@ namespace Voxel {
 
 	}
 
-	void VulkanRenderAPI::DrawIndexed(const Ref<VertexArray>& vertexArray)
+	void VulkanRenderAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
 
 	}

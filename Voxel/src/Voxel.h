@@ -24,6 +24,8 @@
 #include "Voxel/Rendering/Renderer.h"
 #include "Voxel/Rendering/RenderCommand.h"
 
+#include "Voxel/Rendering/Framebuffer.h"
+
 #include "Voxel/Rendering/2D/Renderer2D.h"
 
 #include "Voxel/Rendering/Shaders/Shader.h"

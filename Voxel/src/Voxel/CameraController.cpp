@@ -19,27 +19,27 @@ namespace Voxel {
 
 		glm::vec3 move = glm::vec3(0.0f);
 
-		/*if (Input::IsKeyPressed(KeyCode::KEY_W))
-			move += m_Camera.GetTransform().Forward();
-		if (Input::IsKeyPressed(KeyCode::KEY_S))
-			move -= m_Camera.GetTransform().Forward();
-		if (Input::IsKeyPressed(KeyCode::KEY_A))
-			move -= m_Camera.GetTransform().Right();
-		if (Input::IsKeyPressed(KeyCode::KEY_D))
-			move += m_Camera.GetTransform().Right();*/
+		//if (Input::IsKeyPressed(KeyCode::W))
+		//	move += m_Camera.GetTransform().Forward();
+		//if (Input::IsKeyPressed(KeyCode::S))
+		//	move -= m_Camera.GetTransform().Forward();
+		//if (Input::IsKeyPressed(KeyCode::A))
+		//	move -= m_Camera.GetTransform().Right();
+		//if (Input::IsKeyPressed(KeyCode::D))
+		//	move += m_Camera.GetTransform().Right();
 		
-		if (Input::IsKeyPressed(KeyCode::KEY_W))
-			move += m_Camera.GetTransform().Top();
-		if (Input::IsKeyPressed(KeyCode::KEY_S))
-			move -= m_Camera.GetTransform().Top();
-		if (Input::IsKeyPressed(KeyCode::KEY_A))
+		if (Input::IsKeyPressed(KeyCode::W))
+			move += m_Camera.GetTransform().Up();
+		if (Input::IsKeyPressed(KeyCode::S))
+			move -= m_Camera.GetTransform().Up();
+		if (Input::IsKeyPressed(KeyCode::A))
 			move -= m_Camera.GetTransform().Right();
-		if (Input::IsKeyPressed(KeyCode::KEY_D))
+		if (Input::IsKeyPressed(KeyCode::D))
 			move += m_Camera.GetTransform().Right();
 
-		if (Input::IsKeyPressed(KeyCode::KEY_Q))
+		if (Input::IsKeyPressed(KeyCode::Q))
 			m_Camera.Rotate({ 0, 0, cameraRotationSpeed });
-		if (Input::IsKeyPressed(KeyCode::KEY_E))
+		if (Input::IsKeyPressed(KeyCode::E))
 			m_Camera.Rotate({ 0, 0, -cameraRotationSpeed });
 
 		move *= cameraSpeed;
@@ -56,6 +56,13 @@ namespace Voxel {
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OrthographicCameraController::OnWindowResized));
 	}
 
+	void OrthographicCameraController::OnResize(float width, float height)
+	{
+		PROFILE_FUNCTION();
+		m_AspectRatio = width / height;
+		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+	}
+
 	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& event)
 	{
 		PROFILE_FUNCTION();
@@ -70,8 +77,7 @@ namespace Voxel {
 	bool OrthographicCameraController::OnWindowResized(WindowResizeEvent& event)
 	{
 		PROFILE_FUNCTION();
-		m_AspectRatio = (float) event.GetWidth() / (float) event.GetHeight();
-		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+		OnResize((float) event.GetWidth(), (float) event.GetHeight());
 		return false;
 	}
 
