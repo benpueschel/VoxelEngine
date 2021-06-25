@@ -6,6 +6,8 @@
 #include "Voxel/Events/KeyEvent.h"
 #include "Voxel/Events/MouseEvent.h"
 
+#include "Voxel/Rendering/Renderer.h"
+
 #include "Platform/OpenGL/OpenGLContext.h"
 //#include "Platform/Vulkan/VulkanContext.h"
 
@@ -58,9 +60,16 @@ namespace Voxel {
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
-		glfwWindowHint(GLFW_SAMPLES, 4);
 		{
-			PROFILE_SCOPE("glfwCreateWindow");
+			PROFILE_SCOPE("glfwCreateWindow");		
+			
+			glfwWindowHint(GLFW_SAMPLES, 4);
+
+		#ifdef VOXEL_DEBUG
+			if (Renderer::GetAPI() == RenderAPI::API::OpenGL)
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+		#endif
+
 			m_Window = glfwCreateWindow(props.Width, props.Height, m_Data.Title.c_str(), NULL, NULL);
 		}
 		// TODO: Automatically Create Window context
