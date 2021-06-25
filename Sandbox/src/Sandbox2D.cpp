@@ -14,6 +14,7 @@ Sandbox2D::Sandbox2D()
 	: Layer("Sandbox2D"), m_CameraController(16.0f / 9.0f)
 {
 	m_Texture = Texture2D::Create("assets/textures/ChernoLogo.png");
+	m_Texture->SetScale(glm::vec2(2.0f));
 }
 
 void Sandbox2D::OnAttach()
@@ -28,9 +29,7 @@ void Sandbox2D::OnUpdate(Timestep& timestep)
 {
 	PROFILE_FUNCTION();
 
-	{
-		m_CameraController.OnUpdate(timestep);
-	}
+	m_CameraController.OnUpdate(timestep);
 
 	Renderer2D::BeginScene(m_CameraController.GetCamera());
 	{

@@ -218,6 +218,11 @@ namespace Voxel {
 		UploadUniformInt(name, value);
 	}
 
+	void OpenGLShader::SetIntArray(const std::string& name, int* value, uint32_t count)
+	{
+		UploadUniformIntArray(name, value, count);
+	}
+
 
 	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
 	{
@@ -242,6 +247,11 @@ namespace Voxel {
 	void OpenGLShader::UploadUniformInt4(const std::string& name, glm::ivec4 value)
 	{
 		glUniform4i(GetUniformLocation(name), value.x, value.y, value.z, value.w);
+	}
+
+	void OpenGLShader::UploadUniformIntArray(const std::string& name, int* value, uint32_t count)
+	{
+		glUniform1iv(GetUniformLocation(name), count, value);
 	}
 
 
