@@ -1,43 +1,41 @@
 #include <pch.h>
 
-#include "WindowsInput.h"
+#include "Voxel/Input/Input.h"
 #include "Voxel/Core/Application.h"
 
 #include <GLFW/glfw3.h>
 
 namespace Voxel {
 
-	Scope<Input> Input::s_Instance = CreateScope<WindowsInput>();
-
-	bool WindowsInput::IsKeyPressedImpl(KeyCode keycode)
+	bool Input::IsKeyPressed(KeyCode keycode)
 	{
 		const auto& window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 
-		int state = glfwGetKey(window, keycode);
+		int state = glfwGetKey(window, static_cast<int32_t>(keycode));
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool WindowsInput::IsMouseButtonPressedImpl(MouseButton button)
+	bool Input::IsMouseButtonPressed(MouseButton button)
 	{
 		const auto& window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 
-		int state = glfwGetMouseButton(window, button);
+		int state = glfwGetMouseButton(window, static_cast<int32_t>(button));
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	float WindowsInput::GetMouseXImpl()
+	float Input::GetMouseX()
 	{
-		auto [x, y] = GetMousePosImpl();
+		auto [x, y] = GetMousePosition();
 		return x;
 	}
 
-	float WindowsInput::GetMouseYImpl()
+	float Input::GetMouseY()
 	{
-		auto [x, y] = GetMousePosImpl();
+		auto [x, y] = GetMousePosition();
 		return y;
 	}
 
-	std::pair<float, float> WindowsInput::GetMousePosImpl()
+	std::pair<float, float> Input::GetMousePosition()
 	{
 		const auto& window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 
