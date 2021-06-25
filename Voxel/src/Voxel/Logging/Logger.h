@@ -21,12 +21,14 @@ namespace Voxel {
 
 }
 
+#define LOG_CORE_TRACE(...)		::Voxel::Logger::GetCoreLogger()->trace(__VA_ARGS__)
 #define LOG_CORE_INFO(...)		::Voxel::Logger::GetCoreLogger()->info(__VA_ARGS__)
 #define LOG_CORE_DEBUG(...)		::Voxel::Logger::GetCoreLogger()->debug(__VA_ARGS__)
 #define LOG_CORE_WARN(...)		::Voxel::Logger::GetCoreLogger()->warn(__VA_ARGS__)
 #define LOG_CORE_ERROR(...)		::Voxel::Logger::GetCoreLogger()->error(__VA_ARGS__)
 #define LOG_CORE_FATAL(...)		::Voxel::Logger::GetCoreLogger()->critical(__VA_ARGS__)
 
+#define LOG_TRACE(...)			::Voxel::Logger::GetClientLogger()->trace(__VA_ARGS__)
 #define LOG_INFO(...)			::Voxel::Logger::GetClientLogger()->info(__VA_ARGS__)
 #define LOG_DEBUG(...)			::Voxel::Logger::GetClientLogger()->debug(__VA_ARGS__)
 #define LOG_WARN(...)			::Voxel::Logger::GetClientLogger()->warn(__VA_ARGS__)
