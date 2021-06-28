@@ -3,9 +3,7 @@
 #include <memory>
 #include "Voxel/Logging/Logger.h"
 
-#define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
-
-#define VOXEL_PROFILE 1
+#define BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 #ifdef _WIN32
 	#ifdef _WIN64
@@ -57,14 +55,6 @@
 	#else
 		#define VOXEL_API
 	#endif
-#endif
-
-#ifdef ENABLE_ASSERTS
-	#define ASSERT(x, ...) { if(!x) { LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-	#define CORE_ASSERT(x, ...) { if(!x) { LOG_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-#else
-	#define ASSERT(x, ...)
-	#define CORE_ASSERT(x, ...)
 #endif
 
 #define BIT(x) (1 << x)
