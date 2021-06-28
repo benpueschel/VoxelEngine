@@ -45,3 +45,7 @@ bin-int/
 !vendor/premake/bin/
 !vendor/premake/bin/premake5.exe
 **/imgui.ini
+
+**/VoxellProfile-Runtime.json
+**/VoxellProfile-Shutdown.json
+**/VoxellProfile-Startup.json
