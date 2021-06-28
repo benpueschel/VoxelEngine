@@ -62,7 +62,6 @@ namespace Voxel {
 		EventDispatcher dispatcher(event);
 
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
-		dispatcher.Dispatch<WindowFramebufferResizeEvent>(BIND_EVENT_FN(Application::OnWindowFramebufferResize));
 
 		//LOG_CORE_DEBUG("{0}", event);
 
@@ -78,18 +77,8 @@ namespace Voxel {
 	bool Application::OnWindowClose(WindowCloseEvent& event)
 	{
 		PROFILE_FUNCTION();
-		m_Running = false;
+		m_Running = false; 
 		return true;
-	}
-
-	bool Application::OnWindowFramebufferResize(WindowFramebufferResizeEvent& event)
-	{
-		PROFILE_FUNCTION();
-		if (m_Window->IsMinimized())
-			return false;
-
-		Renderer::OnWindowFramebufferResize(event);
-		return false;
 	}
 
 	void Application::Run()

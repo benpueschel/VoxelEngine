@@ -11,8 +11,6 @@
 
 #include "Voxel/Logging/Logger.h"
 
-#include "Voxel/CameraController.h"
-
 // ----------------- Input ------------------
 
 #include "Voxel/Input/Input.h"
@@ -34,8 +32,14 @@
 
 #include "Voxel/Rendering/Materials/Texture.h"
 
-#include "Voxel/Rendering/Camera/OrthographicCamera.h"
-
 // ----------------- Im Gui -----------------
 
 #include "Voxel/ImGui/ImGuiLayer.h"
+
+// ------------ Entity-Component ------------
+
+#include "Voxel/Scene/Scene.h"
+#include "Voxel/Scene/Entity.h"
+#include "Voxel/Scene/Components/Components.h"
+
+// ------------------------------------------

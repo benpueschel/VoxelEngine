@@ -10,15 +10,15 @@ namespace Voxel {
 
 	void Logger::Init()
 	{
-		spdlog::set_pattern("%^[%T] [%n:%l] [pid %P:tid %t] %v%$");
+		spdlog::set_pattern("%^[%T] [%n:%l] [%s:%#] %v%$");
 
-		s_CoreLogger = spdlog::stdout_color_mt("core");
+		s_CoreLogger = spdlog::stdout_color_mt("CORE");
 		s_CoreLogger->set_level(spdlog::level::trace);
 
-		s_ClientLogger = spdlog::stdout_color_mt("client");
+		s_ClientLogger = spdlog::stdout_color_mt("CLIENT");
 		s_ClientLogger->set_level(spdlog::level::trace);
 
-		s_CoreLogger->info("Logger initialized");
+		LOG_CORE_INFO("Logger initialized");
 	}
 
 }

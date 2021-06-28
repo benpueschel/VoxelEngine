@@ -18,6 +18,7 @@ project "VulkanTest"
 		"%{wks.location}/Voxel/src",
 		"%{wks.location}/Voxel/vendor",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links {

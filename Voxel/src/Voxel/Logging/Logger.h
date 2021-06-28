@@ -21,16 +21,16 @@ namespace Voxel {
 
 }
 
-#define LOG_CORE_TRACE(...)		::Voxel::Logger::GetCoreLogger()->trace(__VA_ARGS__)
-#define LOG_CORE_INFO(...)		::Voxel::Logger::GetCoreLogger()->info(__VA_ARGS__)
-#define LOG_CORE_DEBUG(...)		::Voxel::Logger::GetCoreLogger()->debug(__VA_ARGS__)
-#define LOG_CORE_WARN(...)		::Voxel::Logger::GetCoreLogger()->warn(__VA_ARGS__)
-#define LOG_CORE_ERROR(...)		::Voxel::Logger::GetCoreLogger()->error(__VA_ARGS__)
-#define LOG_CORE_FATAL(...)		::Voxel::Logger::GetCoreLogger()->critical(__VA_ARGS__)
+#define LOG_CORE_TRACE(...)		SPDLOG_LOGGER_TRACE(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
+#define LOG_CORE_INFO(...)		SPDLOG_LOGGER_INFO(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
+#define LOG_CORE_DEBUG(...)		SPDLOG_LOGGER_DEBUG(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
+#define LOG_CORE_WARN(...)		SPDLOG_LOGGER_WARN(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
+#define LOG_CORE_ERROR(...)		SPDLOG_LOGGER_ERROR(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
+#define LOG_CORE_FATAL(...)		SPDLOG_LOGGER_CRITICAL(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
 
-#define LOG_TRACE(...)			::Voxel::Logger::GetClientLogger()->trace(__VA_ARGS__)
-#define LOG_INFO(...)			::Voxel::Logger::GetClientLogger()->info(__VA_ARGS__)
-#define LOG_DEBUG(...)			::Voxel::Logger::GetClientLogger()->debug(__VA_ARGS__)
-#define LOG_WARN(...)			::Voxel::Logger::GetClientLogger()->warn(__VA_ARGS__)
-#define LOG_ERROR(...)			::Voxel::Logger::GetClientLogger()->error(__VA_ARGS__)
-#define LOG_FATAL(...)			::Voxel::Logger::GetClientLogger()->critical(__VA_ARGS__)
+#define LOG_TRACE(...)			SPDLOG_LOGGER_TRACE(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
+#define LOG_INFO(...)			SPDLOG_LOGGER_INFO(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
+#define LOG_DEBUG(...)			SPDLOG_LOGGER_DEBUG(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
+#define LOG_WARN(...)			SPDLOG_LOGGER_WARN(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
+#define LOG_ERROR(...)			SPDLOG_LOGGER_ERROR(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
+#define LOG_FATAL(...)			SPDLOG_LOGGER_CRITICAL(Voxel::Logger::GetClientLogger(), __VA_ARGS__)

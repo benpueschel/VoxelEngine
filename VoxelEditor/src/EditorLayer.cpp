@@ -1,28 +1,31 @@
 #include "EditorLayer.h"
 
 #include <ImGui/imgui.h>
-
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Voxel {
 
 	EditorLayer::EditorLayer()
-		: Layer("EditorLayer"), m_CameraController(16.0f / 9.0f)
+		: Layer("EditorLayer")
 	{
 	}
 
 	void EditorLayer::OnAttach()
 	{
-		m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
-
-		m_Texture = Texture2D::Create("assets/textures/ChernoLogo.png");
-		m_Texture->SetScale(glm::vec2(2.0f));
-
 		FramebufferSpecification viewportSpec;
 		viewportSpec.Width = 1280;
 		viewportSpec.Height = 720;
 
 		m_Framebuffer = Framebuffer::Create(viewportSpec);
+		
+		m_ActiveScene = CreateRef<Scene>();
+
+		m_Entity = m_ActiveScene->CreateEntity("Square");
+		m_Entity.AddComponent<SpriteRendererComponent>(glm::vec4(0, 1, 0, 1));
+
+		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
+		m_CameraEntity.AddComponent<CameraComponent>();
+		m_CameraEntity.GetComponent<TransformComponent>().SetPosition(glm::vec3(0, 0, 2));
 	}
 
 	void EditorLayer::OnDetach()
@@ -33,53 +36,36 @@ namespace Voxel {
 	void EditorLayer::OnUpdate(Timestep& timestep)
 	{
 
-
 		if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
 			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
 			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
 		{
 			m_Framebuffer->Resize((uint32_t) m_ViewportSize.x, (uint32_t) m_ViewportSize.y);
-			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+			m_ActiveScene->OnViewportResize((uint32_t) m_ViewportSize.x, (uint32_t) m_ViewportSize.y);
 		}
-
-		if (m_ViewportFocused)
-			m_CameraController.OnUpdate(timestep);
 
 		m_Framebuffer->Bind();
 
 		RenderCommand::SetClearColor({ 0.1f ,0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
 
-		Renderer2D::BeginScene(m_CameraController.GetCamera());
-		{
-			PROFILE_SCOPE("Draw 400 Quads");
-			for (int y = 0; y < 20; y++)
-			{
-				for (int x = 0; x < 20; x++)
-				{
-					Transform transform;
-					transform.SetScale(glm::vec3(0.1f));
-					transform.SetPosition(glm::vec3(x * 1.1f, y * 1.1f, 0.0f) * transform.GetScale());
-
-					Renderer2D::DrawQuad(transform, m_SquareColor);
-				}
-			}
-		}
-		{
-			PROFILE_SCOPE("Draw 1 Quad");
-			Transform transform;
-			transform.SetPosition({ 0, 0, 10.0f });
-			Renderer2D::DrawQuad(transform, m_Texture);
-		}
-
-		Renderer2D::EndScene();
+		m_ActiveScene->OnUpdate(timestep);
 
 		m_Framebuffer->Unbind();
 	}
 
 	void EditorLayer::OnEvent(Event& event)
 	{
-		m_CameraController.OnEvent(event);
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+
+		if (event.GetEventType() == EventType::WindowRestored)
+		{ 
+			WindowRestoreEvent& restoreEvent = (WindowRestoreEvent&) event;
+			m_ViewportSize = { (float) restoreEvent.GetWidth(), (float) restoreEvent.GetHeight() };
+
+			m_Framebuffer->Resize(restoreEvent.GetWidth(), restoreEvent.GetHeight());
+		}
+
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -150,13 +136,22 @@ namespace Voxel {
 
 		ImGui::Begin("Debug");
 
-		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+		ImGui::Separator();
 
-		ImGui::Text("Camera Position: %.2f %.2f %.2f",
-			m_CameraController.GetCamera().GetTransform().GetPosition().x,
-			m_CameraController.GetCamera().GetTransform().GetPosition().y,
-			m_CameraController.GetCamera().GetTransform().GetPosition().z
-		);
+		ImGui::Text("%s", m_Entity.GetComponent<TagComponent>().Tag.c_str());
+
+		auto& squareColor = m_Entity.GetComponent<SpriteRendererComponent>().Color;
+		ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
+
+		ImGui::Separator();
+
+		if (m_CameraEntity.HasComponent<TransformComponent>())
+		{
+			auto& cameraTransform = m_CameraEntity.GetComponent<TransformComponent>();
+			auto& camera = m_CameraEntity.GetComponent<CameraComponent>();
+			ImGui::DragFloat3("Camera Position: ", glm::value_ptr(cameraTransform.MGetPosition()), 0.01f);
+			ImGui::DragFloat2("Clipping Plane: ", glm::value_ptr(camera.Camera.GetClippingPlane()), 0.01f);
+		}
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();

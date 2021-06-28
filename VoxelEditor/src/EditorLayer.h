@@ -20,17 +20,15 @@ namespace Voxel {
 		virtual void OnImGuiRender();
 
 	private:
-		Ref<Texture2D> m_CheckerboardTexture;
 		Ref<Framebuffer> m_Framebuffer;
-
-		OrthographicCameraController m_CameraController;
-
-		glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
-		Ref<Texture2D> m_Texture;
 		ImVec2 m_ViewportSize;
 
-		bool m_ViewportFocused;
-		bool m_ViewportHovered;
+		bool m_ViewportFocused = true;
+		bool m_ViewportHovered = false;
+
+		Ref<Scene> m_ActiveScene;
+		Entity m_Entity;
+		Entity m_CameraEntity;
 	};
 
 }

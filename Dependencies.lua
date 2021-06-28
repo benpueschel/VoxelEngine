@@ -8,6 +8,7 @@ IncludeDir["glm"] 				= "%{VOXEL_VENDOR}/glm"
 IncludeDir["stb_image"]			= "%{VOXEL_VENDOR}/stb_image"
 IncludeDir["GLAD"] 				= "%{VOXEL_VENDOR}/GLAD/include"
 IncludeDir["ImGui"] 			= "%{VOXEL_VENDOR}/ImGui"
+IncludeDir["entt"]				= "%{VOXEL_VENDOR}/entt/include"
 IncludeDir["VulkanSDK"]			= "%{VULKAN_SDK}/Include"
 
 LibraryDir = {}

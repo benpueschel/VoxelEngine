@@ -31,11 +31,13 @@ namespace Voxel {
 
 		void Close();
 
+		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+
 		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& event);
-		bool OnWindowFramebufferResize(WindowFramebufferResizeEvent& event);
+		bool OnWindowRestore(WindowRestoreEvent& event);
 
 		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
