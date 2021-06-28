@@ -7,6 +7,8 @@
 
 #include <thread>
 
+#define VOXEL_PROFILE 0
+
 using namespace std::chrono;
 
 namespace Voxel {
@@ -25,15 +27,7 @@ namespace Voxel {
 
 	class Instrumentor
 	{
-	private:
-		InstrumentationSession* m_CurrentSession;
-		std::ofstream m_OutputStream;
-		int m_ProfileCount;
 	public:
-		Instrumentor()
-			: m_CurrentSession(nullptr), m_ProfileCount(0)
-		{
-		}
 
 		void BeginSession(const std::string& name, const std::string& filepath = "results.json")
 		{
@@ -89,6 +83,22 @@ namespace Voxel {
 			static Instrumentor instance;
 			return instance;
 		}
+
+	private:
+		Instrumentor()
+			: m_CurrentSession(nullptr), m_ProfileCount(0)
+		{
+		}
+
+		~Instrumentor()
+		{
+			EndSession();
+		}
+
+	private:
+		InstrumentationSession* m_CurrentSession;
+		std::ofstream m_OutputStream;
+		int m_ProfileCount;
 	};
 
 	class InstrumentationTimer
@@ -145,12 +155,16 @@ namespace Voxel {
 	#elif defined(__cplusplus) && (__cplusplus >= 201103)
 		#define VOXEL_FUNC_SIG __func__
 	#else
-		#define VOXEL_FUNC_SIG "HZ_FUNC_SIG unknown!"
+		#define VOXEL_FUNC_SIG "VOXEL_FUNC_SIG unknown!"
 	#endif
 
 	#define PROFILE_BEGIN_SESSION(name, path) :: Voxel::Instrumentor::Get().BeginSession(name, path)
 	#define PROFILE_END_SESSION() :: Voxel::Instrumentor::Get().EndSession()
-	#define PROFILE_SCOPE(name) :: Voxel::InstrumentationTimer timer##__LINE__(name);
+	#define PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName = \
+		::Voxel::InstrumentorUtils::GetCleanOutputString(name, "__cdecl"); \
+		::Voxel::InstrumentationTimer timer##line(fixedName##line.Data)
+	#define PROFILE_SCOPE_LINE(name, line) PROFILE_SCOPE_LINE2(name, line)
+	#define PROFILE_SCOPE(name) PROFILE_SCOPE(name, __LINE__)
 	#define PROFILE_FUNCTION() PROFILE_SCOPE(VOXEL_FUNC_SIG)
 #else
 	#define PROFILE_BEGIN_SESSION(name, path)
