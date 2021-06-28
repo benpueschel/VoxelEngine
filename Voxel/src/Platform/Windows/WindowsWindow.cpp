@@ -178,7 +178,7 @@ namespace Voxel {
 
 			MouseScrolledEvent event((float)xOffset, (float)yOffset);
 			data.EventCallback(event);
-			});
+		});
 
 		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double x, double y) {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
@@ -192,10 +192,16 @@ namespace Voxel {
 			data.Minimized = minimized;
 			data.Maximized = false;
 
+			int width, height;
+			glfwGetWindowSize(window, &width, &height);
+
+			data.Width = width;
+			data.Height = height;
+
 			if (minimized == GLFW_TRUE)
 				data.EventCallback(WindowMinimizeEvent());
 			else
-				data.EventCallback(WindowRestoreEvent());
+				data.EventCallback(WindowRestoreEvent(data.Width, data.Height));
 		});
 
 		glfwSetWindowMaximizeCallback(m_Window, [](GLFWwindow* window, int maximized) {
@@ -203,10 +209,16 @@ namespace Voxel {
 			data.Maximized = maximized;
 			data.Minimized = false;
 
+			int width, height;
+			glfwGetWindowSize(window, &width, &height);
+
+			data.Width = width;
+			data.Height = height;
+
 			if (maximized == GLFW_TRUE)
-				data.EventCallback(WindowMaximizeEvent());
+				data.EventCallback(WindowMaximizeEvent(data.Width, data.Height));
 			else
-				data.EventCallback(WindowRestoreEvent());
+				data.EventCallback(WindowRestoreEvent(data.Width, data.Height));
 		});
 
 	}

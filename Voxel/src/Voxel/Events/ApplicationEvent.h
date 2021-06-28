@@ -7,13 +7,13 @@ namespace Voxel {
 	class WindowResizeEvent : public Event
 	{
 	public:
-		WindowResizeEvent(unsigned int width, unsigned int height)
+		WindowResizeEvent(uint32_t width, uint32_t height)
 			: m_Width(width), m_Height(height)
 		{
 		}
 
-		unsigned int GetWidth() const { return m_Width; }
-		unsigned int GetHeight() const { return m_Height; }
+		uint32_t GetWidth() const { return m_Width; }
+		uint32_t GetHeight() const { return m_Height; }
 
 		std::string ToString() const override
 		{
@@ -25,19 +25,19 @@ namespace Voxel {
 		EVENT_CLASS_TYPE(WindowResize)
 			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	private:
-		unsigned int m_Width, m_Height;
+		uint32_t m_Width, m_Height;
 	};
 
 	class WindowFramebufferResizeEvent : public Event
 	{
 	public:
-		WindowFramebufferResizeEvent(unsigned int width, unsigned int height)
+		WindowFramebufferResizeEvent(uint32_t width, uint32_t height)
 			: m_Width(width), m_Height(height)
 		{
 		}
 
-		unsigned int GetWidth() const { return m_Width; }
-		unsigned int GetHeight() const { return m_Height; }
+		uint32_t GetWidth() const { return m_Width; }
+		uint32_t GetHeight() const { return m_Height; }
 
 		std::string ToString() const override
 		{
@@ -49,7 +49,7 @@ namespace Voxel {
 		EVENT_CLASS_TYPE(WindowFramebufferResize)
 			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	private:
-		unsigned int m_Width, m_Height;
+		uint32_t m_Width, m_Height;
 	};
 
 	class WindowMinimizeEvent : public Event
@@ -64,19 +64,37 @@ namespace Voxel {
 	class WindowMaximizeEvent : public Event
 	{
 	public:
-		WindowMaximizeEvent() = default;
+		WindowMaximizeEvent(uint32_t width, uint32_t height)
+			: m_Width(width), m_Height(height)
+		{
+		}
+
+		uint32_t GetWidth() { return m_Width; }
+		uint32_t GetHeight() { return m_Height; }
 
 		EVENT_CLASS_TYPE(WindowMaximized)
 			EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+		uint32_t m_Width, m_Height;
 	};
 
 	class WindowRestoreEvent : public Event
 	{
 	public:
-		WindowRestoreEvent() = default;
+		WindowRestoreEvent(uint32_t width, uint32_t height)
+			: m_Width(width), m_Height(height)
+		{
+		}
+
+		uint32_t GetWidth() { return m_Width; }
+		uint32_t GetHeight() { return m_Height; }
 
 		EVENT_CLASS_TYPE(WindowRestored)
 			EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+		uint32_t m_Width, m_Height;
 	};
 
 	class WindowCloseEvent : public Event
