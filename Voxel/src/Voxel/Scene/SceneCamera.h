@@ -8,26 +8,42 @@ namespace Voxel {
 	class SceneCamera : public Camera
 	{
 	public:
+		enum class ProjectionType : uint32_t { Perspective = 0, Orthographic = 1 };
+	public:
 		SceneCamera();
 		SceneCamera(const glm::mat4& projection);
 		virtual ~SceneCamera() = default;
 
 		void SetOrthographic(float size, const glm::vec2& clipingPlane);
 		void SetPerspective(float fov, const glm::vec2& clipingPlane);
+		void SetProjectionType(ProjectionType type);
 
 		void SetViewportSize(uint32_t width, uint32_t height);
-
-		glm::vec2& GetClippingPlane() { return m_ClippingPlane; }
-
-	private:
 		void RecalculateProjection();
 
+		ProjectionType& GetProjectionType() { return m_ProjectionType; }
+		const ProjectionType& GetProjectionType() const { return m_ProjectionType; }
+
+		float& GetPerspectiveFOV() { return m_PerspectiveFOV; }
+		glm::vec2& GetPerspectiveClippingPlane() { return m_PerspectiveClippingPlane; }
+
+		float& GetOrthographicSize() { return m_OrthographicSize; }
+		glm::vec2& GetOrthographicClippingPlane() { return m_OrthographicClippingPlane; }
+
+		glm::vec2& GetClippingPlane()
+		{
+			if (m_ProjectionType == ProjectionType::Orthographic)
+				return m_OrthographicClippingPlane;
+			return m_PerspectiveClippingPlane;
+		}
+
 	private:
-		bool m_Orthographic = false;
+		ProjectionType m_ProjectionType = ProjectionType::Perspective;
 		float m_PerspectiveFOV = 90.0f;
 		float m_OrthographicSize = 10.0f;
 		float m_AspectRatio = 0.0f;
-		glm::vec2 m_ClippingPlane { 0.001f, 1000.0f };
+		glm::vec2 m_PerspectiveClippingPlane{ 0.001f, 10000.0f };
+		glm::vec2 m_OrthographicClippingPlane{ -100.0f, 100.0f };
 	};
 
 }

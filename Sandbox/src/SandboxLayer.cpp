@@ -7,7 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 SandboxLayer::SandboxLayer()
-	: Layer("SandboxLayer"), m_CameraController(16.0f / 9.0f), m_ShaderLibrary()
+	: Layer("SandboxLayer"), m_ShaderLibrary()
 {
 	m_SquareVA = VertexArray::Create();
 
@@ -49,7 +49,6 @@ void SandboxLayer::OnAttach() {}
 void SandboxLayer::OnDetach() {}
 void SandboxLayer::OnEvent(Event& event) 
 {
-	m_CameraController.OnEvent(event);
 }
 
 void SandboxLayer::OnImGuiRender()
@@ -58,21 +57,12 @@ void SandboxLayer::OnImGuiRender()
 
 	ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
 
-	ImGui::Text("Camera Position: %f %f %f",
-		m_CameraController.GetCamera().GetTransform().GetPosition().x,
-		m_CameraController.GetCamera().GetTransform().GetPosition().y,
-		m_CameraController.GetCamera().GetTransform().GetPosition().z
-	);
-
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::End();
 }
 
 void SandboxLayer::OnUpdate(Timestep& timestep)
 {
-	m_CameraController.OnUpdate(timestep);
-
-	Renderer::BeginScene(m_CameraController.GetCamera());
 
 	auto FlatColorShader = m_ShaderLibrary.GetShader("ColorShader");
 	FlatColorShader->Bind();

@@ -42,4 +42,6 @@
 #include "Voxel/Scene/Entity.h"
 #include "Voxel/Scene/Components/Components.h"
 
+#include "Voxel/Scene/ScriptableEntity.h"
+
 // ------------------------------------------

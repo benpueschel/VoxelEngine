@@ -20,8 +20,6 @@ private:
 	ShaderLibrary m_ShaderLibrary;
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 
-	OrthographicCameraController m_CameraController;
-
 	Ref<VertexArray> m_SquareVA;
 
 	Ref<Texture2D> m_Texture;

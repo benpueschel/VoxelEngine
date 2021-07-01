@@ -18,17 +18,23 @@ namespace Voxel {
 
 	void SceneCamera::SetOrthographic(float size, const glm::vec2& clipingPlane)
 	{
-		m_Orthographic = true;
+		m_ProjectionType = ProjectionType::Orthographic;
 		m_OrthographicSize = size;
-		m_ClippingPlane = clipingPlane;
+		m_OrthographicClippingPlane = clipingPlane;
 		RecalculateProjection();
 	}
 
 	void SceneCamera::SetPerspective(float fov, const glm::vec2& clipingPlane)
 	{
-		m_Orthographic = false;
+		m_ProjectionType = ProjectionType::Perspective;
 		m_PerspectiveFOV = fov;
-		m_ClippingPlane = clipingPlane;
+		m_PerspectiveClippingPlane = clipingPlane;
+		RecalculateProjection();
+	}
+
+	void SceneCamera::SetProjectionType(ProjectionType type)
+	{
+		m_ProjectionType = type;
 		RecalculateProjection();
 	}
 
@@ -44,15 +50,17 @@ namespace Voxel {
 
 	void SceneCamera::RecalculateProjection()
 	{
-		if (m_Orthographic)
+		if (m_ProjectionType == ProjectionType::Orthographic)
 		{
 			float orthoWidth = m_OrthographicSize * m_AspectRatio * 0.5f;
 			float ortoHeight = m_OrthographicSize * 0.5f;
-			m_Projection = glm::ortho(-orthoWidth, orthoWidth, -ortoHeight, ortoHeight, m_ClippingPlane.x, m_ClippingPlane.y);
+			m_Projection = glm::ortho(-orthoWidth, orthoWidth, -ortoHeight, ortoHeight, 
+				m_OrthographicClippingPlane.x, m_OrthographicClippingPlane.y);
 		}
-		else
+		else if(m_ProjectionType == ProjectionType::Perspective)
 		{
-			m_Projection = glm::perspective(m_PerspectiveFOV, m_AspectRatio, m_ClippingPlane.x, m_ClippingPlane.y);
+			m_Projection = glm::perspective(m_PerspectiveFOV, m_AspectRatio, 
+				m_PerspectiveClippingPlane.x, m_PerspectiveClippingPlane.y);
 		}
 	}
 

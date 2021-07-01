@@ -20,7 +20,8 @@ namespace Voxel {
 		T& AddComponent(Args&&... args)
 		{
 			CORE_ASSERT(!HasComponent<T>(), "Entity already owns this component");
-			return m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
+			T& component = m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
+			return component;
 		}
 
 		template<typename T>
@@ -28,6 +29,14 @@ namespace Voxel {
 		{
 			CORE_ASSERT(HasComponent<T>(), "Entity does not own this component");
 			return m_Scene->m_Registry.get<T>(m_EntityHandle);
+		}
+
+		void GetComponents()
+		{
+			m_Scene->m_Registry.visit(m_EntityHandle, [&](const entt::type_info info) {
+				auto& component = m_Scene->m_Registry.get(m_EntityHandle);
+				
+			});
 		}
 
 		template<typename T>
@@ -43,15 +52,22 @@ namespace Voxel {
 			m_Scene->m_Registry.remove<T>(m_EntityHandle);
 		}
 
+		Scene* GetScene()
+		{
+			return m_Scene;
+		}
+
 		bool operator ==(const Entity& other) const
 		{
 			return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene;
 		}
+		bool operator !=(const Entity& other) const { return !(*this == other); }
 
-		bool operator !=(const Entity& other) const
-		{
-			return !(*this == other);
-		}
+		operator uint32_t() const { return (uint32_t)m_EntityHandle; }
+		operator uint32_t() { return (uint32_t)m_EntityHandle; }
+		operator entt::entity() { return m_EntityHandle; }
+
+		operator bool() { return m_EntityHandle != entt::null && m_Scene; }
 
 	private:
 		entt::entity m_EntityHandle{ entt::null };

@@ -50,7 +50,7 @@ namespace Voxel {
 
 		shader->Bind();
 		shader->SetMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
-		shader->SetMat4("u_Transform", entity.GetComponent<TransformComponent>().Transform);
+		shader->SetMat4("u_Transform", entity.GetComponent<TransformComponent>());
 
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
