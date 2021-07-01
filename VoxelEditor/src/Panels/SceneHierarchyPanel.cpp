@@ -12,6 +12,8 @@ namespace Voxel {
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& context)
 	{
 		m_Context = context;
+		if(m_Properties)
+			m_Properties->m_Context = {};
 	}
 
 	void SceneHierarchyPanel::SetPropertiesPanel(const Ref<PropertiesPanel>& panel)

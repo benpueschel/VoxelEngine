@@ -33,7 +33,7 @@ project "Voxel"
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.ImTerm}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.yaml-cpp}",
+		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.VulkanSDK}"
 	}
 
@@ -41,6 +41,7 @@ project "Voxel"
 		"GLFW",
 		"GLAD",
 		"ImGui",
+		"yaml-cpp",
 		"opengl32.lib"
 	}
 

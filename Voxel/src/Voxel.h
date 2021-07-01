@@ -45,3 +45,9 @@
 #include "Voxel/Scene/ScriptableEntity.h"
 
 // ------------------------------------------
+
+// ------------------ Utils -----------------
+
+#include "Voxel/Utils/PlatformUtils.h"
+
+// ------------------------------------------

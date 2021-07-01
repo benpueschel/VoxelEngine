@@ -1,5 +1,7 @@
 #include "EditorLayer.h"
 
+#include "Voxel/Scene/SceneSerializer.h"
+
 #include <ImGui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -22,22 +24,11 @@ namespace Voxel {
 
 		m_ActiveScene = CreateRef<Scene>();
 
-		m_Entity = m_ActiveScene->CreateEntity("Square");
-		m_Entity.AddComponent<SpriteRendererComponent>(glm::vec4(0, 1, 0, 1));
-
-		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
-		m_CameraEntity.AddComponent<CameraComponent>();
-		m_CameraEntity.GetComponent<TransformComponent>().SetLocalPosition(glm::vec3(0, 0, 2));
-
-		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<EditorCamera>();
-
 		m_SceneHierarchyPanel = CreateRef<SceneHierarchyPanel>();
 		m_PropertiesPanel = CreateRef<PropertiesPanel>();
 		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
 		m_SceneHierarchyPanel->SetPropertiesPanel(m_PropertiesPanel);
 
-			
-		//m_LogPanel = LogPanel();
 	}
 
 	void EditorLayer::OnDetach()
@@ -69,14 +60,82 @@ namespace Voxel {
 	{
 		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused);
 
-		if (event.GetEventType() == EventType::WindowRestored)
-		{ 
-			WindowRestoreEvent& restoreEvent = (WindowRestoreEvent&) event;
-			m_ViewportSize = { (float) restoreEvent.GetWidth(), (float) restoreEvent.GetHeight() };
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<WindowRestoreEvent>(BIND_EVENT_FN(EditorLayer::OnWindowRestored));
+	}
 
-			m_Framebuffer->Resize(restoreEvent.GetWidth(), restoreEvent.GetHeight());
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
+	{
+		if (event.GetRepeatCount() == 0)
+		{
+			bool control = Input::IsKeyPressed(KeyCode::LeftControl) || Input::IsKeyPressed(KeyCode::RightControl);
+			bool shift = Input::IsKeyPressed(KeyCode::LeftShift) || Input::IsKeyPressed(KeyCode::RightShift);
+
+			switch (event.GetKeyCode())
+			{
+				case KeyCode::N:
+					if (control)
+						NewScene();
+					break;
+
+				case KeyCode::O:
+					if (control)
+						OpenScene();
+					break;
+
+				case KeyCode::S:
+					if (control && shift)
+						SaveSceneAs();
+					break;
+			}
+			return true;
 		}
+		return false;
+	}
 
+	bool EditorLayer::OnWindowRestored(WindowRestoreEvent& event)
+	{
+		m_ViewportSize = { (float)event.GetWidth(), (float)event.GetHeight() };
+		m_Framebuffer->Resize(event.GetWidth(), event.GetHeight());
+		return false;
+	}
+
+	void EditorLayer::NewScene()
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
+	}
+	void EditorLayer::OpenScene()
+	{
+		auto& path = FileDialogs::OpenFile(VOXEL_SCENE_FILE_FILTER);
+		if (!path.empty())
+		{
+			m_ActiveScene = CreateRef<Scene>();
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.DeserializeText(path);
+			m_SceneHierarchyPanel->SetContext(m_ActiveScene);
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			Application::Get().GetWindow().SetTitle("VoxelEditor - " + m_ActiveScene->GetName());
+		}
+	}
+	void EditorLayer::SaveScene()
+	{
+
+	}
+	void EditorLayer::SaveSceneAs()
+	{
+		auto& path = FileDialogs::SaveFile(VOXEL_SCENE_FILE_FILTER);
+		if (!path.empty())
+		{
+			auto& sceneName = path.stem().string();
+			m_ActiveScene->SetName(sceneName);
+
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.SerializeText(path);
+			Application::Get().GetWindow().SetTitle("VoxelEditor - " + m_ActiveScene->GetName());
+		}
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -126,6 +185,16 @@ namespace Voxel {
 		{
 			if (ImGui::BeginMenu("File"))
 			{
+
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+					NewScene();
+
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+					OpenScene();
+
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+					SaveSceneAs();
+
 				if (ImGui::MenuItem("Close"))
 					Application::Get().Close();
 

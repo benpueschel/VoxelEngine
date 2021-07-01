@@ -20,7 +20,7 @@ project "VoxelEditor"
 		"%{IncludeDir.ImTerm}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.yaml-cpp}"
+		"%{IncludeDir.yaml_cpp}"
 	}
 
 	links {

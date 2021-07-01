@@ -15,11 +15,6 @@ namespace Voxel {
 				| ImGuiTreeNodeFlags_FramePadding
 				| ImGuiTreeNodeFlags_AllowItemOverlap;
 
-			const static auto transformTreeNodeFlags = 
-				ImGuiTreeNodeFlags_Framed
-				| ImGuiTreeNodeFlags_FramePadding
-				| ImGuiTreeNodeFlags_AllowItemOverlap;
-
 			if (m_Context.HasComponent<TagComponent>())
 				m_Context.GetComponent<TagComponent>().OnImGuiRender();
 
@@ -31,12 +26,12 @@ namespace Voxel {
 
 			if (ImGui::BeginPopup("AddComponent"))
 			{
-				if (ImGui::MenuItem("Camera"))
+				if (!m_Context.HasComponent<CameraComponent>() && ImGui::MenuItem("Camera"))
 				{
 					m_Context.AddComponent<CameraComponent>();
 					ImGui::CloseCurrentPopup();
 				}
-				if (ImGui::MenuItem("Sprite Renderer"))
+				if (!m_Context.HasComponent<SpriteRendererComponent>() && ImGui::MenuItem("Sprite Renderer"))
 				{
 					m_Context.AddComponent<SpriteRendererComponent>();
 					ImGui::CloseCurrentPopup();
@@ -47,7 +42,7 @@ namespace Voxel {
 
 			ImGui::PopItemWidth();
 
-			DrawComponent<TransformComponent>("Transform", transformTreeNodeFlags, false);
+			DrawComponent<TransformComponent>("Transform", treeNodeFlags, false);
 			DrawComponent<CameraComponent>("Camera", treeNodeFlags);
 			DrawComponent<SpriteRendererComponent>("Sprite Renderer", treeNodeFlags);
 

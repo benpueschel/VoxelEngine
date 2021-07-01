@@ -11,21 +11,27 @@ namespace Voxel {
 	class Scene
 	{
 	public:
-		Scene();
+		Scene(const std::string& name = "Unnamed Scene");
 		~Scene();
 
 		Entity CreateEntity(const std::string& name = "Empty Entity");
 		void DestroyEntity(Entity& entity);
 
-		std::vector<Entity*> GetEntities();
-
 		void OnUpdate(Timestep timestep);
 		void OnViewportResize(uint32_t width, uint32_t height);
+
+		void SetName(const std::string& name);
+		std::string& GetName();
+
+		static Ref<Scene>& Scene::LoadScene(const std::string& path);
+		static Ref<Scene>& Scene::SampleScene();
 	private:
 		entt::registry m_Registry;
+		std::string m_Name;
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 		friend class Entity;
+		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
 	};
 

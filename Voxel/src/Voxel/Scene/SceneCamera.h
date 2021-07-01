@@ -21,6 +21,12 @@ namespace Voxel {
 		void SetViewportSize(uint32_t width, uint32_t height);
 		void RecalculateProjection();
 
+		void SetPerspectiveFOV(float fov) { m_PerspectiveFOV = fov; }
+		void SetPerspectiveClippingPlane(glm::vec2& plane) { m_PerspectiveClippingPlane = plane; }
+
+		void SetOrthographicSize(float size) { m_OrthographicSize = size; }
+		void SetOrthographicClippingPlane(glm::vec2& plane) { m_OrthographicClippingPlane = plane; }
+
 		ProjectionType& GetProjectionType() { return m_ProjectionType; }
 		const ProjectionType& GetProjectionType() const { return m_ProjectionType; }
 

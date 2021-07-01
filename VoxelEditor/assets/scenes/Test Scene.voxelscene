@@ -1,0 +1,27 @@
+Scene: Test Scene
+Entities:
+  - Entity: 1
+    TagComponent:
+      Tag: Square
+    TransformComponent:
+      LocalPosition: [0, 0, 0]
+      LocalRotation: [0, 0, 0]
+      LocalScale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 1, 0, 1]
+  - Entity: 0
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      LocalPosition: [0, 0, 2]
+      LocalRotation: [0, 0, 0]
+      LocalScale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 90
+        PerspectiveClippingPlane: [0.00100000005, 10000]
+        OrthographicClippingPlane: [-100, 100]
+        OrthographicSize: 10
+      Primary: true
+      FixedAspectRatio: false

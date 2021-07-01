@@ -11,10 +11,12 @@
 #include "ScriptableEntity.h"
 
 #include "Voxel/Core/Application.h"
+#include "Voxel/Scene/SceneSerializer.h"
 
 namespace Voxel {
 
-	Scene::Scene()
+	Scene::Scene(const std::string& name)
+		: m_Name(name)
 	{
 
 	}
@@ -35,16 +37,6 @@ namespace Voxel {
 	void Scene::DestroyEntity(Entity& entity)
 	{
 		m_Registry.destroy(entity);
-	}
-
-	std::vector<Entity*> Scene::GetEntities()
-	{
-		std::vector<Entity*> entities {};
-		m_Registry.view().each([=](auto entityID) {
-			Entity entity{ entityID, this };
-			entities.push_back(&entity);
-		});
-		return entities;
 	}
 
 	void Scene::OnUpdate(Timestep timestep)
@@ -108,6 +100,37 @@ namespace Voxel {
 			}
 
 		}
+	}
+
+	void Scene::SetName(const std::string& name)
+	{
+		m_Name = name;
+	}
+
+	std::string& Scene::GetName()
+	{
+		return m_Name;
+	}
+
+	Ref<Scene>& Scene::LoadScene(const std::string& path)
+	{
+		Ref<Scene> scene = CreateRef<Scene>();
+		SceneSerializer serializer(scene);
+		serializer.DeserializeText(path);
+		return scene;
+	}
+
+	Ref<Scene>& Scene::SampleScene()
+	{
+		Ref<Scene> scene = CreateRef<Scene>();
+
+		//auto& camera = scene->CreateEntity("Main Camera");
+		//camera.AddComponent<CameraComponent>();
+
+		//auto& square = scene->CreateEntity("Blue Square");
+		//square.AddComponent<SpriteRendererComponent>(glm::vec4(0.2f, 0.2f, 0.8f, 1.0f));
+
+		return scene;
 	}
 
 }

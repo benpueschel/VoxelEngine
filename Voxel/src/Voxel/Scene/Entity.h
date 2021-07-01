@@ -31,6 +31,14 @@ namespace Voxel {
 			return m_Scene->m_Registry.get<T>(m_EntityHandle);
 		}
 
+		template<typename T>
+		T& GetOrAddComponent()
+		{
+			if (HasComponent<T>())
+				return GetComponent<T>();
+			return AddComponent<T>();
+		}
+
 		void GetComponents()
 		{
 			m_Scene->m_Registry.visit(m_EntityHandle, [&](const entt::type_info info) {

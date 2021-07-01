@@ -70,7 +70,7 @@ namespace Voxel {
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 		#endif
 
-			m_Window = glfwCreateWindow(props.Width, props.Height, m_Data.Title.c_str(), NULL, NULL);
+			m_Window = glfwCreateWindow(props.Width, props.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		}
 		// TODO: Automatically Create Window context
 		m_Context = CreateScope<OpenGLContext>(m_Window);
@@ -278,5 +278,16 @@ namespace Voxel {
 	}
 
 	bool WindowsWindow::IsMaximized() const { return m_Data.Maximized; }
+
+	void WindowsWindow::SetTitle(const std::string& title)
+	{
+		m_Data.Title = title;
+		glfwSetWindowTitle(m_Window, title.c_str());
+	}
+
+	std::string& WindowsWindow::GetTitle()
+	{
+		return m_Data.Title;
+	}
 
 }

@@ -22,7 +22,14 @@ namespace Voxel {
 		virtual void OnEvent(Event & event);
 
 		virtual void OnImGuiRender();
+	private:
+		bool EditorLayer::OnKeyPressed(KeyPressedEvent& event);
+		bool EditorLayer::OnWindowRestored(WindowRestoreEvent& event);
 
+		void NewScene();
+		void OpenScene();
+		void SaveScene();
+		void SaveSceneAs();
 	private:
 		Ref<Framebuffer> m_Framebuffer;
 		ImVec2 m_ViewportSize;
@@ -31,12 +38,10 @@ namespace Voxel {
 		bool m_ViewportHovered = false;
 
 		Ref<Scene> m_ActiveScene;
-		Entity m_Entity;
-		Entity m_CameraEntity;
 
 		Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
 		Ref<PropertiesPanel> m_PropertiesPanel;
-		LogPanel m_LogPanel;
+		//LogPanel m_LogPanel;
 	};
 
 }

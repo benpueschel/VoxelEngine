@@ -26,6 +26,8 @@ namespace Voxel {
 		bool IsMinimized() const override;
 		void SetMaximized(bool maximized) override;
 		bool IsMaximized() const override;
+		virtual void SetTitle(const std::string& title) override;
+		virtual std::string& GetTitle() override;
 
 		virtual void* GetNativeWindow() const { return m_Window; }
 	private:

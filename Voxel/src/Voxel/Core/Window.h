@@ -44,6 +44,9 @@ namespace Voxel {
 		virtual void SetMaximized(bool maximized) = 0;
 		virtual bool IsMaximized() const = 0;
 
+		virtual void SetTitle(const std::string& title) = 0;
+		virtual std::string& GetTitle() = 0;
+
 
 		virtual void* GetNativeWindow() const = 0;
 
