@@ -14,6 +14,9 @@ namespace Voxel {
 		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
 		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
 
+		static void AddSink(const std::shared_ptr<spdlog::sinks::sink>& sink);
+		static void RecreateLoggers();
+
 	private:
 		static std::shared_ptr<spdlog::logger> s_CoreLogger;
 		static std::shared_ptr<spdlog::logger> s_ClientLogger;
@@ -21,16 +24,18 @@ namespace Voxel {
 
 }
 
-#define LOG_CORE_TRACE(...)		SPDLOG_LOGGER_TRACE(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
-#define LOG_CORE_INFO(...)		SPDLOG_LOGGER_INFO(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
-#define LOG_CORE_DEBUG(...)		SPDLOG_LOGGER_DEBUG(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
-#define LOG_CORE_WARN(...)		SPDLOG_LOGGER_WARN(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
-#define LOG_CORE_ERROR(...)		SPDLOG_LOGGER_ERROR(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
-#define LOG_CORE_FATAL(...)		SPDLOG_LOGGER_CRITICAL(Voxel::Logger::GetCoreLogger(), __VA_ARGS__)
+#define LOGGER_SRC(logger, level, ...) (logger)->log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, level, __VA_ARGS__)
 
-#define LOG_TRACE(...)			SPDLOG_LOGGER_TRACE(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
-#define LOG_INFO(...)			SPDLOG_LOGGER_INFO(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
-#define LOG_DEBUG(...)			SPDLOG_LOGGER_DEBUG(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
-#define LOG_WARN(...)			SPDLOG_LOGGER_WARN(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
-#define LOG_ERROR(...)			SPDLOG_LOGGER_ERROR(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
-#define LOG_FATAL(...)			SPDLOG_LOGGER_CRITICAL(Voxel::Logger::GetClientLogger(), __VA_ARGS__)
+#define LOG_CORE_TRACE(...)		LOGGER_SRC(Voxel::Logger::GetCoreLogger(), spdlog::level::trace, __VA_ARGS__)
+#define LOG_CORE_INFO(...)		LOGGER_SRC(Voxel::Logger::GetCoreLogger(), spdlog::level::info, __VA_ARGS__)
+#define LOG_CORE_DEBUG(...)		LOGGER_SRC(Voxel::Logger::GetCoreLogger(), spdlog::level::debug, __VA_ARGS__)
+#define LOG_CORE_WARN(...)		LOGGER_SRC(Voxel::Logger::GetCoreLogger(), spdlog::level::warn, __VA_ARGS__)
+#define LOG_CORE_ERROR(...)		LOGGER_SRC(Voxel::Logger::GetCoreLogger(), spdlog::level::err, __VA_ARGS__)
+#define LOG_CORE_FATAL(...)		LOGGER_SRC(Voxel::Logger::GetCoreLogger(), spdlog::level::critical, __VA_ARGS__)
+
+#define LOG_TRACE(...)			LOGGER_SRC(Voxel::Logger::GetClientLogger(), spdlog::level::trace, __VA_ARGS__)
+#define LOG_INFO(...)			LOGGER_SRC(Voxel::Logger::GetClientLogger(), spdlog::level::info, __VA_ARGS__)
+#define LOG_DEBUG(...)			LOGGER_SRC(Voxel::Logger::GetClientLogger(), spdlog::level::debug, __VA_ARGS__)
+#define LOG_WARN(...)			LOGGER_SRC(Voxel::Logger::GetClientLogger(), spdlog::level::warn, __VA_ARGS__)
+#define LOG_ERROR(...)			LOGGER_SRC(Voxel::Logger::GetClientLogger(), spdlog::level::err, __VA_ARGS__)
+#define LOG_FATAL(...)			LOGGER_SRC(Voxel::Logger::GetClientLogger(), spdlog::level::critical, __VA_ARGS__)
