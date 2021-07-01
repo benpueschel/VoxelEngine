@@ -23,6 +23,7 @@ namespace Voxel {
 		void End();
 
 		void BlockEvents(bool blockEvents) { m_BlockEvents = blockEvents; }
+		bool IsBlockingEvents() { return m_BlockEvents; }
 
 	private:
 		bool m_BlockEvents = true;
