@@ -78,6 +78,7 @@ namespace Voxel {
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(false);
+		SetMaximized(true);
 
 		// SET GLFW CALLBACKS
 
