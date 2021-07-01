@@ -16,8 +16,11 @@ project "VoxelEditor"
 		"%{IncludeDir.spdlog}",
 		"%{wks.location}/Voxel/src",
 		"%{wks.location}/Voxel/vendor",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.ImTerm}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml-cpp}"
 	}
 
 	links {

@@ -24,10 +24,11 @@ group "Dependencies"
 	include "Voxel/vendor/glfw"
 	include "Voxel/vendor/GLAD"
 	include "Voxel/vendor/ImGui"
+	include "Voxel/vendor/yaml-cpp"
 
 group ""
 
 include "Voxel"
 include "VoxelEditor"
-include "Sandbox"
+-- include "Sandbox"
 include "VulkanTest"

@@ -31,7 +31,9 @@ project "Voxel"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.GLAD}",
 		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.ImTerm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml-cpp}",
 		"%{IncludeDir.VulkanSDK}"
 	}
 

@@ -3,6 +3,10 @@
 #include "Voxel.h"
 
 #include <ImGui/imgui.h>
+#include <imterm/terminal.hpp>
+#include "Panels/SceneHierarchyPanel.h"
+#include "Panels/PropertiesPanel.h"
+#include "Panels/LogPanel.h"
 
 namespace Voxel {
 
@@ -29,6 +33,10 @@ namespace Voxel {
 		Ref<Scene> m_ActiveScene;
 		Entity m_Entity;
 		Entity m_CameraEntity;
+
+		Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
+		Ref<PropertiesPanel> m_PropertiesPanel;
+		LogPanel m_LogPanel;
 	};
 
 }
