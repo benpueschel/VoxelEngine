@@ -14,3 +14,6 @@
 	path = Voxel/vendor/glm
 	url = https://github.com/g-truc/glm
 	branch = "master"
+[submodule "Voxel/vendor/yaml-cpp"]
+	path = Voxel/vendor/yaml-cpp
+	url = https://github.com/RealGreyCode/yaml-cpp/
