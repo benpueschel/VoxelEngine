@@ -28,9 +28,8 @@ namespace Voxel {
 		ofn.nFilterIndex = 1;
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 		if (GetOpenFileNameA(&ofn) == TRUE)
-		{
 			return ofn.lpstrFile;
-		}
+
 		return std::filesystem::path();
 	}
 
@@ -48,9 +47,8 @@ namespace Voxel {
 		ofn.nFilterIndex = 1;
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 		if (GetSaveFileNameA(&ofn) == TRUE)
-		{
 			return ofn.lpstrFile;
-		}
+
 		return std::filesystem::path();
 	}
 
