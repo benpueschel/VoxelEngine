@@ -11,6 +11,8 @@
 
 #include "Voxel/Logging/Logger.h"
 
+#include "Voxel/Math/Math.h"
+
 // ----------------- Input ------------------
 
 #include "Voxel/Input/Input.h"
