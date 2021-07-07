@@ -16,14 +16,12 @@ out vec4 v_Color;
 out vec2 v_TexCoord;
 out float v_TexIndex;
 out vec2 v_TexScale;
-out int v_EntityID;
 
 void main() {
 	v_TexCoord = _TexCoord;
 	v_TexIndex = _TexIndex;
 	v_TexScale = _TexScale;
 	v_Color = _Color;
-	v_EntityID = 0;
 	gl_Position = u_ViewProjection * vec4(_Position, 1.0);
 }
 
@@ -31,13 +29,12 @@ void main() {
 #version 330 core
 
 layout(location = 0) out vec4 color;
-layout(location = 1) out int entities;
+layout(location = 1) out int entityID;
 
 in vec4 v_Color;
 in vec2 v_TexCoord;
 in float v_TexIndex;
 in vec2 v_TexScale;
-in int v_EntityID;
 
 uniform sampler2D u_Textures[32];
 			
@@ -80,6 +77,5 @@ void main() {
 	}
 
 	color = texColor;
-	entities = v_EntityID;
-
+	entityID = 0;
 }
