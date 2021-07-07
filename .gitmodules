@@ -17,3 +17,6 @@
 [submodule "Voxel/vendor/yaml-cpp"]
 	path = Voxel/vendor/yaml-cpp
 	url = https://github.com/RealGreyCode/yaml-cpp/
+[submodule "Voxel/vendor/ImGuizmo"]
+	path = Voxel/vendor/ImGuizmo
+	url = https://github.com/RealGreyCode/ImGuizmo
