@@ -1,0 +1,63 @@
+Scene: White Cube
+Entities:
+  - Entity: 5
+    TagComponent:
+      Tag: Back
+    TransformComponent:
+      LocalPosition: [0.349999994, 0, -0.349999994]
+      LocalRotation: [0, -0.785398185, 0]
+      LocalScale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.337254912, 0.337254912, 0.337254912, 1]
+  - Entity: 4
+    TagComponent:
+      Tag: Left
+    TransformComponent:
+      LocalPosition: [-0.349999994, 0, -0.349999994]
+      LocalRotation: [0, 0.785398185, 0]
+      LocalScale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.694117665, 0.694117665, 0.694117665, 1]
+  - Entity: 3
+    TagComponent:
+      Tag: Front
+    TransformComponent:
+      LocalPosition: [-0.349999994, 0, 0.349999994]
+      LocalRotation: [0, -0.785398185, 0]
+      LocalScale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.850980401, 0.850980401, 0.850980401, 1]
+  - Entity: 2
+    TagComponent:
+      Tag: Right
+    TransformComponent:
+      LocalPosition: [0.349999994, 0, 0.349999994]
+      LocalRotation: [0, 0.785398185, 0]
+      LocalScale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.647058845, 0.647058845, 0.647058845, 1]
+  - Entity: 1
+    TagComponent:
+      Tag: Top
+    TransformComponent:
+      LocalPosition: [0, 0.5, 0]
+      LocalRotation: [1.57079637, 0, 0.785398185]
+      LocalScale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+  - Entity: 0
+    TagComponent:
+      Tag: Main Camera
+    TransformComponent:
+      LocalPosition: [0, 2, 4]
+      LocalRotation: [-0.492182851, 0, 0]
+      LocalScale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 45
+        PerspectiveClippingPlane: [0.00100000005, 10000]
+        OrthographicClippingPlane: [-100, 100]
+        OrthographicSize: 10
+      Primary: true
+      FixedAspectRatio: false

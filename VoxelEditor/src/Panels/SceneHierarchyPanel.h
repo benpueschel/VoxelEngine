@@ -18,6 +18,8 @@ namespace Voxel {
 		void SetPropertiesPanel(const Ref<PropertiesPanel>& panel);
 
 		void OnImGuiRender();
+
+		Ref<PropertiesPanel>& GetPropertiesPanel() { return m_Properties; }
 	private:
 		void DrawEntityNode(Entity& entity);
 	private:

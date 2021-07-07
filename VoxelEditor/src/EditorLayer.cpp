@@ -3,9 +3,9 @@
 #include "Voxel/Scene/SceneSerializer.h"
 
 #include <ImGui/imgui.h>
+#include <ImGuizmo.h>
 #include <glm/gtc/type_ptr.hpp>
-
-#include "EditorCamera.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 namespace Voxel {
 
@@ -19,6 +19,10 @@ namespace Voxel {
 		FramebufferSpecification viewportSpec;
 		viewportSpec.Width = 1280;
 		viewportSpec.Height = 720;
+		viewportSpec.Attachments = { 
+			FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, 
+			FramebufferTextureFormat::Depth 
+		};
 
 		m_Framebuffer = Framebuffer::Create(viewportSpec);
 
@@ -28,7 +32,6 @@ namespace Voxel {
 		m_PropertiesPanel = CreateRef<PropertiesPanel>();
 		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
 		m_SceneHierarchyPanel->SetPropertiesPanel(m_PropertiesPanel);
-
 	}
 
 	void EditorLayer::OnDetach()
@@ -43,6 +46,7 @@ namespace Voxel {
 			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
 		{
 			m_Framebuffer->Resize((uint32_t) m_ViewportSize.x, (uint32_t) m_ViewportSize.y);
+			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 			m_ActiveScene->OnViewportResize((uint32_t) m_ViewportSize.x, (uint32_t) m_ViewportSize.y);
 		}
 
@@ -51,14 +55,36 @@ namespace Voxel {
 		RenderCommand::SetClearColor({ 0.1f ,0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
 
-		m_ActiveScene->OnUpdate(timestep);
+		if (m_ViewportFocused)
+		{
+			m_EditorCamera.OnUpdate(timestep);
+		}
+		m_ActiveScene->OnUpdateEditor(timestep, m_EditorCamera);
+
+		if (Input::IsMouseButtonPressed(MouseButton::ButtonLeft))
+		{
+
+			glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+			auto [mouseX, mouseY] = ImGui::GetMousePos();
+			mouseX -= m_ViewportBounds[0].x;
+			mouseY -= viewportSize.y;
+			mouseY = m_ViewportBounds[0].y - mouseY; // Invert for OpenGL
+
+			if (mouseX >= 0 && mouseY >= 0 && mouseX < viewportSize.x && mouseY < viewportSize.y)
+			{
+				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+				LOG_CORE_DEBUG("Pixel Data: {0}", pixelData);
+			}
+		}
 
 		m_Framebuffer->Unbind();
 	}
 
 	void EditorLayer::OnEvent(Event& event)
 	{
-		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused);
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+
+		m_EditorCamera.OnEvent(event);
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -88,6 +114,20 @@ namespace Voxel {
 					if (control && shift)
 						SaveSceneAs();
 					break;
+
+				// Gizmos
+				case KeyCode::Q:
+					m_GizmoType = -1;
+					break;
+				case KeyCode::W:
+					m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+					break;
+				case KeyCode::E:
+					m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+					break;
+				case KeyCode::R:
+					m_GizmoType = ImGuizmo::OPERATION::SCALE;
+					break;
 			}
 			return true;
 		}
@@ -104,6 +144,7 @@ namespace Voxel {
 	void EditorLayer::NewScene()
 	{
 		m_ActiveScene = CreateRef<Scene>();
+		m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
 	}
@@ -185,7 +226,6 @@ namespace Voxel {
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-
 				if (ImGui::MenuItem("New", "Ctrl+N"))
 					NewScene();
 
@@ -206,25 +246,83 @@ namespace Voxel {
 
 		m_SceneHierarchyPanel->OnImGuiRender();
 		m_PropertiesPanel->OnImGuiRender();
-		//m_LogPanel.OnImGuiRender();
 
 		ImGui::Begin("Debug");
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 
-		// TODO: Viewport
+		// Viewport
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
 		ImGui::Begin("Viewport");
+		auto viewportOffset = ImGui::GetCursorPos();
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
 		m_ViewportSize = ImGui::GetContentRegionAvail();
 
-		uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		uint32_t textureID = m_Framebuffer->GetColorAttachments()[0];
 		ImGui::Image((void*)textureID, m_ViewportSize, { 0, 1 }, { 1, 0 });
+
+		ImVec2 windowSize = ImGui::GetWindowSize();
+		ImVec2 minBound = ImGui::GetWindowPos();
+		minBound.x += viewportOffset.x;
+		minBound.y += viewportOffset.y;
+
+		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+		m_ViewportBounds[0].x = minBound.x;
+		m_ViewportBounds[0].y = minBound.y;
+		m_ViewportBounds[1].x = maxBound.x;
+		m_ViewportBounds[1].y = maxBound.y;
+
+		// Gizmos
+		Entity& selectedEntity = m_SceneHierarchyPanel->GetPropertiesPanel()->GetContext();
+		if (selectedEntity && selectedEntity.HasComponent<TransformComponent>() && m_GizmoType != -1)
+		{
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+
+			ImVec2 pos = ImGui::GetWindowPos();
+			ImVec2 size = ImGui::GetWindowSize();
+			ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
+
+			const glm::mat4& view = m_EditorCamera.GetViewMatrix();
+			const glm::mat4& projection = m_EditorCamera.GetProjection();
+
+			auto& tc = selectedEntity.GetComponent<TransformComponent>();
+			glm::mat4& transform = tc.GetTransform();
+			glm::mat4 deltaTransform = transform;
+
+			glm::vec3 previousRotation = tc.LocalRotation;
+			glm::vec3 mappedRotation;
+			Math::DecomposeRotation(transform, mappedRotation);
+
+			// Snapping
+			bool snap = Input::IsKeyPressed(KeyCode::LeftControl);
+			float snapValue = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? 45.0f : 0.5f;
+
+			float snapValues[3] = { snapValue, snapValue, snapValue };
+
+			ImGuizmo::Manipulate(
+				glm::value_ptr(view), glm::value_ptr(projection),
+				static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::LOCAL,
+				glm::value_ptr(transform), nullptr, snap ? snapValues : nullptr
+			);
+
+			if (ImGuizmo::IsUsing())
+			{
+				glm::vec3 position;
+				glm::vec3 rotation;
+				glm::vec3 scale;
+				Math::DecomposeTransform(transform, position, rotation, scale);
+
+				tc.LocalPosition = position;
+				tc.LocalRotation = previousRotation - mappedRotation + rotation;
+				tc.LocalScale = scale;
+			}
+		}
 
 		ImGui::End();
 		ImGui::PopStyleVar();

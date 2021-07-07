@@ -31,6 +31,7 @@ project "Voxel"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.GLAD}",
 		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.ImTerm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml_cpp}",
@@ -41,6 +42,7 @@ project "Voxel"
 		"GLFW",
 		"GLAD",
 		"ImGui",
+		"ImGuizmo",
 		"yaml-cpp",
 		"opengl32.lib"
 	}

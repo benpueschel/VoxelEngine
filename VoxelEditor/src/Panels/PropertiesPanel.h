@@ -20,6 +20,8 @@ namespace Voxel {
 		}
 
 		void OnImGuiRender();
+
+		Entity& GetContext() { return m_Context; }
 	private:
 		//TODO: Move "removable" to the component
 		template<typename Component>

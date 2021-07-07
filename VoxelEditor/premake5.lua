@@ -17,6 +17,7 @@ project "VoxelEditor"
 		"%{wks.location}/Voxel/src",
 		"%{wks.location}/Voxel/vendor",
 		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.ImTerm}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",

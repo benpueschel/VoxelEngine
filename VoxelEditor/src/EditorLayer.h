@@ -8,6 +8,8 @@
 #include "Panels/PropertiesPanel.h"
 #include "Panels/LogPanel.h"
 
+#include "Voxel/Rendering/EditorCamera.h"
+
 namespace Voxel {
 
 	class EditorLayer : public Layer
@@ -33,11 +35,15 @@ namespace Voxel {
 	private:
 		Ref<Framebuffer> m_Framebuffer;
 		ImVec2 m_ViewportSize;
-
+		glm::vec2 m_ViewportBounds[2];
 		bool m_ViewportFocused = true;
 		bool m_ViewportHovered = false;
 
+		EditorCamera m_EditorCamera;
+
 		Ref<Scene> m_ActiveScene;
+
+		int m_GizmoType = -1;
 
 		Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
 		Ref<PropertiesPanel> m_PropertiesPanel;

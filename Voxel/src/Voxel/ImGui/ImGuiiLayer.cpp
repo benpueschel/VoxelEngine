@@ -2,8 +2,8 @@
 #include "ImGuiLayer.h"
 
 #include <imgui.h>
-#include <examples/imgui_impl_opengl3.h>
-#include <examples/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <backends/imgui_impl_glfw.h>
 #include "UILibrary.h"
 
 #include "Voxel/Core/Application.h"
@@ -13,6 +13,8 @@
 // TEMPORARY
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+
+#include <ImGuizmo.h>
 
 namespace Voxel {
 
@@ -76,6 +78,7 @@ namespace Voxel {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiLayer::End()
@@ -97,7 +100,6 @@ namespace Voxel {
 
 			glfwMakeContextCurrent(backupCurrentContext);
 		}
-
 	}
 
 	void ImGuiLayer::OnImGuiRender()
