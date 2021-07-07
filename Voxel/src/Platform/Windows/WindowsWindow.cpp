@@ -20,9 +20,9 @@ namespace Voxel {
 		LOG_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	Window* Window::Create(const WindowProps& props)
+	Scope<Window> Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return CreateScope<WindowsWindow>(props);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
@@ -252,6 +252,42 @@ namespace Voxel {
 	}
 
 	bool WindowsWindow::IsVSync() const { return m_Data.VSync; }
+
+
+	void WindowsWindow::SetWindowMode(WindowMode windowMode)
+	{
+		m_Data.WindowMode = windowMode;
+
+		// TODO: OS-independent Monitor Interface to allow other monitors
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+		switch (windowMode)
+		{
+			case WindowMode::FULLSCREEN:
+				glfwSetWindowMonitor(m_Window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+				break;
+			case WindowMode::BORDERLESS_FULLSCREEN:
+				glfwSetWindowMonitor(m_Window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+				glfwSetWindowAttrib(m_Window, GLFW_DECORATED, GLFW_FALSE);
+				break;
+			case WindowMode::BORDERLESS_WINDOW:
+				glfwSetWindowMonitor(m_Window, nullptr, 0, 0, mode->width, mode->height, mode->refreshRate);
+				glfwSetWindowAttrib(m_Window, GLFW_DECORATED, GLFW_FALSE);
+				break;
+			case WindowMode::WINDOWED:
+				glfwSetWindowMonitor(m_Window, nullptr, 0, 0, m_Data.Width, m_Data.Height, GLFW_DONT_CARE);
+				glfwSetWindowAttrib(m_Window, GLFW_DECORATED, GLFW_TRUE);
+				break;
+		}
+
+	}
+
+
+	Voxel::WindowMode WindowsWindow::GetWindowMode()
+	{
+		return m_Data.WindowMode;
+	}
 
 	void WindowsWindow::SetMinimized(bool minimized)
 	{

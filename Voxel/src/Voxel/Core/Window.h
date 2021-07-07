@@ -7,14 +7,24 @@
 
 namespace Voxel {
 
+	enum class WindowMode : uint32_t
+	{
+		WINDOWED = 0,
+		FULLSCREEN = 1,
+		BORDERLESS_WINDOW = 2,
+		BORDERLESS_FULLSCREEN = 3
+	};
+
 	struct WindowProps
 	{
 		std::string Title;
 		uint32_t Width;
 		uint32_t Height;
+		WindowMode Mode;
 
-		WindowProps(const std::string& title = "Voxel Engine", uint32_t width = 1600, uint32_t height = 900)
-			: Title(title), Width(width), Height(height)
+		WindowProps(const std::string& title = "Voxel Engine", uint32_t width = 1600, uint32_t height = 900, 
+			WindowMode mode = WindowMode::WINDOWED) 
+			: Title(title), Width(width), Height(height), Mode(mode)
 		{
 		}
 	};
@@ -38,6 +48,9 @@ namespace Voxel {
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 
+		virtual void SetWindowMode(WindowMode windowMode) = 0;
+		virtual WindowMode GetWindowMode() = 0;
+
 		virtual void SetMinimized(bool minimized) = 0;
 		virtual bool IsMinimized() const = 0;
 
@@ -50,7 +63,7 @@ namespace Voxel {
 
 		virtual void* GetNativeWindow() const = 0;
 
-		static Window* Create(const WindowProps& props = WindowProps());
+		static Scope <Window> Create(const WindowProps &props = WindowProps());
 	};
 
 }

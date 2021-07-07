@@ -20,12 +20,19 @@ namespace Voxel {
 
 		// Window attributes
 		void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
+
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
+
+		virtual void SetWindowMode(WindowMode windowMode) override;
+		virtual WindowMode GetWindowMode() override;
+
 		void SetMinimized(bool minimized) override;
 		bool IsMinimized() const override;
+
 		void SetMaximized(bool maximized) override;
 		bool IsMaximized() const override;
+
 		virtual void SetTitle(const std::string& title) override;
 		virtual std::string& GetTitle() override;
 
@@ -44,6 +51,7 @@ namespace Voxel {
 			bool VSync;
 			bool Minimized;
 			bool Maximized;
+			WindowMode WindowMode;
 
 			EventCallbackFn EventCallback;
 		};
