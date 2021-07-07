@@ -9,6 +9,7 @@ namespace Voxel {
 	{
 
 		virtual void Init() override;
+		virtual void Shutdown() override;
 		virtual void SetViewport(glm::ivec4 dimensions) override;
 
 		virtual void SetClearColor(const glm::vec4& color) override;

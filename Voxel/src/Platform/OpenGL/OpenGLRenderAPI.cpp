@@ -37,6 +37,10 @@ namespace Voxel {
 		glEnable(GL_DEPTH_TEST);
 	}
 
+	void OpenGLRenderAPI::Shutdown()
+	{
+	}
+
 	void OpenGLRenderAPI::SetViewport(glm::ivec4 dimensions)
 	{
 		glViewport(dimensions.x, dimensions.y, dimensions.z, dimensions.w);
