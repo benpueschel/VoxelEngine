@@ -4,6 +4,7 @@
 #include "Components/Components.h"
 #include "Voxel/Rendering/2D/Renderer2D.h"
 #include "Voxel/Rendering/Camera.h"
+#include "Voxel/Rendering/EditorCamera.h"
 
 #include <glm/glm.hpp>
 
@@ -39,7 +40,19 @@ namespace Voxel {
 		m_Registry.destroy(entity);
 	}
 
-	void Scene::OnUpdate(Timestep timestep)
+	void Scene::OnUpdateEditor(Timestep timestep, EditorCamera& camera)
+	{
+		Renderer2D::BeginScene(camera);
+		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto entity : group)
+		{
+			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			Renderer2D::DrawQuad((glm::mat4)transform, sprite.Color);
+		}
+		Renderer2D::EndScene();
+	}
+
+	void Scene::OnUpdateRuntime(Timestep timestep)
 	{
 		if (!Application::Get().GetImGuiLayer()->IsBlockingEvents())
 		{
@@ -55,25 +68,13 @@ namespace Voxel {
 			});
 		}
 
-		Camera* mainCamera = nullptr;
-		glm::mat4& mainCameraTransform = glm::mat4(1.0f);
+		Entity mainCameraEntity = GetPrimaryCamera();
+		if (mainCameraEntity)
 		{
-			auto view = m_Registry.view<TransformComponent, CameraComponent>();
-			for (auto entity : view)
-			{
-				auto& [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
-				if (camera.Primary)
-				{
-					mainCamera = &camera.Camera;
-					mainCameraTransform = transform;
-					break;
-				}
-			}
-		}
+			Camera& mainCamera = mainCameraEntity.GetComponent<CameraComponent>().Camera;
+			glm::mat4& mainCameraTransform = mainCameraEntity.GetComponent<TransformComponent>();
 
-		if (mainCamera)
-		{
-			Renderer2D::BeginScene(mainCamera->GetProjection(), mainCameraTransform);
+			Renderer2D::BeginScene(mainCamera.GetProjection(), mainCameraTransform);
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto entity : group)
 			{
@@ -89,17 +90,26 @@ namespace Voxel {
 	{
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
-		
+
 		auto view = m_Registry.view<CameraComponent>();
 		for (auto entity : view)
 		{
 			auto& camera = view.get<CameraComponent>(entity);
 			if (!camera.FixedAspectRatio)
-			{
 				camera.Camera.SetViewportSize(width, height);
-			}
-
 		}
+	}
+
+	Entity Scene::GetPrimaryCamera()
+	{
+		auto view = m_Registry.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			const auto& camera = view.get<CameraComponent>(entity);
+			if (camera.Primary)
+				return Entity{ entity, this };
+		}
+		return {};
 	}
 
 	void Scene::SetName(const std::string& name)

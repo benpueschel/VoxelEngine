@@ -64,11 +64,11 @@ namespace Voxel {
 
 		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
 		s_Data.QuadVertexBuffer->SetLayout({
-			{ ShaderDataType::Float3, "position" },
-			{ ShaderDataType::Float4, "color" },
-			{ ShaderDataType::Float2, "texCoord" },
-			{ ShaderDataType::Float,  "texIndex" },
-			{ ShaderDataType::Float2, "texScale" },
+			{ ShaderDataType::Float3, "_Position" },
+			{ ShaderDataType::Float4, "_Color" },
+			{ ShaderDataType::Float2, "_TexCoord" },
+			{ ShaderDataType::Float,  "_TexIndex" },
+			{ ShaderDataType::Float2, "_TexScale" },
 		});
 		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
@@ -128,6 +128,20 @@ namespace Voxel {
 		s_Data.TextureSlotIndex = 1;
 	}
 
+
+	void Renderer2D::BeginScene(const EditorCamera& camera)
+	{
+		PROFILE_FUNCTION();
+
+		s_Data.TextureShader->Bind();
+		s_Data.TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjection());
+
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+		s_Data.TextureSlotIndex = 1;
+	}
+
 	void Renderer2D::EndScene()
 	{
 		PROFILE_FUNCTION();
@@ -156,77 +170,6 @@ namespace Voxel {
 	{
 		DrawQuad(transform, texture, glm::vec4(1.0f));
 	}
-
-	//void Renderer2D::DrawQuad(glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& color)
-	//{
-	//	PROFILE_FUNCTION();
-
-	//	int textureIndex = 0;
-	//	if (texture)
-	//	{
-	//		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
-	//		{
-	//			if (*s_Data.TextureSlots[i].get() == *texture.get())
-	//			{
-	//				textureIndex = s_Data.TextureSlotIndex;
-	//				break;
-	//			}
-	//		}
-
-	//		if (textureIndex == 0)
-	//		{
-	//			textureIndex = s_Data.TextureSlotIndex;
-	//			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-	//			s_Data.TextureSlotIndex++;
-	//		}
-	//	}
-
-	//	glm::vec3& position = transform.GetPosition();
-	//	glm::vec3& scale = transform.GetScale();
-
-	//	glm::vec3& up = transform.Up() * scale;
-	//	glm::vec3& right = transform.Right() * scale;
-
-	//	glm::vec2& textureScale = texture ? texture->GetScale() : glm::vec2(1.0f);
-
-	//	s_Data.QuadVertexBufferPtr->Position = position;
-	//	s_Data.QuadVertexBufferPtr->Color = color;
-	//	s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
-	//	s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-	//	s_Data.QuadVertexBufferPtr->TexScale = textureScale;
-	//	s_Data.QuadVertexBufferPtr++;
-
-	//	s_Data.QuadVertexBufferPtr->Position = position + right;
-	//	s_Data.QuadVertexBufferPtr->Color = color;
-	//	s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
-	//	s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-	//	s_Data.QuadVertexBufferPtr->TexScale = textureScale;
-	//	s_Data.QuadVertexBufferPtr++;
-
-	//	s_Data.QuadVertexBufferPtr->Position = position + right + up;
-	//	s_Data.QuadVertexBufferPtr->Color = color;
-	//	s_Data.QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-	//	s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-	//	s_Data.QuadVertexBufferPtr->TexScale = textureScale;
-	//	s_Data.QuadVertexBufferPtr++;
-
-	//	s_Data.QuadVertexBufferPtr->Position = position + up;
-	//	s_Data.QuadVertexBufferPtr->Color = color;
-	//	s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-	//	s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-	//	s_Data.QuadVertexBufferPtr->TexScale = textureScale;
-	//	s_Data.QuadVertexBufferPtr++;
-
-	//	s_Data.QuadIndexCount += 6;
-
-	//	/*
-	//	texture->Bind();
-	//	s_Data.TextureShader->SetMat4("u_Transform", transform.GetTransform());
-	//	s_Data.TextureShader->SetFloat("u_Scale", texture->GetScale());
-
-	//	s_Data.QuadVertexArray->Bind();
-	//	RenderCommand::DrawIndexed(s_Data.QuadVertexArray); */
-	//}
 
 	void Renderer2D::DrawQuad(glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& color)
 	{
@@ -268,7 +211,7 @@ namespace Voxel {
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
 			s_Data.QuadVertexBufferPtr->Color = color;
 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr->TexIndex = static_cast<float>(textureIndex);
 			s_Data.QuadVertexBufferPtr->TexScale = textureScale;
 			s_Data.QuadVertexBufferPtr++;
 		}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Voxel/Core/Timestep.h"
+#include "Voxel/Rendering/EditorCamera.h"
 
 #include "entt.hpp"
 
@@ -17,8 +18,11 @@ namespace Voxel {
 		Entity CreateEntity(const std::string& name = "Empty Entity");
 		void DestroyEntity(Entity& entity);
 
-		void OnUpdate(Timestep timestep);
+		void OnUpdateRuntime(Timestep timestep);
+		void OnUpdateEditor(Timestep timestep, EditorCamera& camera);
 		void OnViewportResize(uint32_t width, uint32_t height);
+
+		Entity GetPrimaryCamera();
 
 		void SetName(const std::string& name);
 		std::string& GetName();

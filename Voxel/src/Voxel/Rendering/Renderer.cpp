@@ -39,9 +39,34 @@ namespace Voxel {
 		s_SceneData->ViewProjectionMatrix = camera.GetProjection() * glm::inverse(transform);
 	}
 
+
+	void Renderer::BeginScene(const EditorCamera& camera)
+	{
+		s_SceneData->ViewProjectionMatrix = camera.GetViewProjection();
+	}
+
 	void Renderer::EndScene()
 	{
 
+	}
+
+	void Renderer::Submit(Entity& entity)
+	{
+		if (!entity.HasComponent<TransformComponent>()) return;
+
+		auto& transform = entity.GetComponent<TransformComponent>();
+
+		if (entity.HasComponent<VoxelRendererComponent>())
+		{
+			// Render voxels
+			auto& renderer = entity.GetComponent<VoxelRendererComponent>();
+			auto& shader = renderer.Material.GetShader();
+
+			shader->Bind();
+			shader->SetMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
+			shader->SetMat4("u_Transform", transform);
+
+		}
 	}
 
 	void Renderer::Submit(Entity& entity, const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray)
@@ -55,4 +80,5 @@ namespace Voxel {
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
 	}
+
 }

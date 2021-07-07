@@ -2,6 +2,7 @@
 
 #include "Voxel/Rendering/Camera.h"
 #include "Voxel/Rendering/Materials/Texture.h"
+#include "Voxel/Rendering/EditorCamera.h"
 
 namespace Voxel {
 
@@ -12,6 +13,7 @@ namespace Voxel {
 		static void Shutdown();
 
 		static void BeginScene(const Camera& camera, const glm::mat4& transform);
+		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
 		static void Flush();
 

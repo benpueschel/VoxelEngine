@@ -2,6 +2,7 @@
 
 #include "RenderCommand.h"
 #include "Camera.h"
+#include "EditorCamera.h"
 
 #include "Shaders/Shader.h"
 
@@ -20,8 +21,10 @@ namespace Voxel {
 		static void OnWindowRestore(WindowRestoreEvent& event);
 
 		static void BeginScene(const Camera& camera, const glm::mat4& transform);
+		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
 
+		void Renderer::Submit(Entity& entity);
 		static void Submit(
 			Entity& entity,
 			const Ref<Shader>& shader,
