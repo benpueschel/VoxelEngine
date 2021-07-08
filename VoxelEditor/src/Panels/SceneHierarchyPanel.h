@@ -1,30 +1,27 @@
 #pragma once
 
-#include "Voxel.h"
+#include "Panel.h"
+#include "../EditorState.h"
 
-#include "PropertiesPanel.h"
+#include "Voxel.h"
 
 namespace Voxel {
 
 	struct PropertiesPanel;
 
-	class SceneHierarchyPanel
+	class SceneHierarchyPanel : public Panel
 	{
 	public:
-		SceneHierarchyPanel() = default;
-		SceneHierarchyPanel(const Ref<Scene>& context);
+		SceneHierarchyPanel(EditorState& state) 
+			: m_State(state), Panel("Scene Hierarchy") {}
 
-		void SetContext(const Ref<Scene>& context);
-		void SetPropertiesPanel(const Ref<PropertiesPanel>& panel);
+		virtual void OnImGuiRender() override;
+		virtual void OnEvent(Event& event) override;
 
-		void OnImGuiRender();
-
-		Ref<PropertiesPanel>& GetPropertiesPanel() { return m_Properties; }
 	private:
 		void DrawEntityNode(Entity& entity);
 	private:
-		Ref<Scene> m_Context;
-		Ref<PropertiesPanel> m_Properties;
+		EditorState& m_State;
 	};
 
 }

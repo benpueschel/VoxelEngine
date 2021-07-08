@@ -4,9 +4,9 @@
 
 #include <ImGui/imgui.h>
 #include <imterm/terminal.hpp>
-#include "Panels/SceneHierarchyPanel.h"
-#include "Panels/PropertiesPanel.h"
-#include "Panels/LogPanel.h"
+
+#include "Panels/Panel.h"
+#include "EditorState.h"
 
 #include "Voxel/Rendering/EditorCamera.h"
 
@@ -40,15 +40,12 @@ namespace Voxel {
 		bool m_ViewportFocused = true;
 		bool m_ViewportHovered = false;
 
+		EditorState m_EditorState;
 		EditorCamera m_EditorCamera;
-
-		Ref<Scene> m_ActiveScene;
 
 		int m_GizmoType = -1;
 
-		Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
-		Ref<PropertiesPanel> m_PropertiesPanel;
-		//LogPanel m_LogPanel;
+		std::vector<Ref<Panel>> m_Panels;
 	};
 
 }
