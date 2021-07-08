@@ -55,27 +55,13 @@ namespace Voxel {
 		RenderCommand::SetClearColor({ 0.1f ,0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
 
+		m_Framebuffer->ClearAttachment(1, -1);
+
 		if (m_ViewportFocused)
 		{
 			m_EditorCamera.OnUpdate(timestep);
 		}
 		m_ActiveScene->OnUpdateEditor(timestep, m_EditorCamera);
-
-		if (Input::IsMouseButtonPressed(MouseButton::ButtonLeft))
-		{
-
-			glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
-			auto [mouseX, mouseY] = ImGui::GetMousePos();
-			mouseX -= m_ViewportBounds[0].x;
-			mouseY -= viewportSize.y;
-			mouseY = m_ViewportBounds[0].y - mouseY; // Invert for OpenGL
-
-			if (mouseX >= 0 && mouseY >= 0 && mouseX < viewportSize.x && mouseY < viewportSize.y)
-			{
-				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-				LOG_CORE_DEBUG("Pixel Data: {0}", pixelData);
-			}
-		}
 
 		m_Framebuffer->Unbind();
 	}
@@ -89,6 +75,7 @@ namespace Voxel {
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<WindowRestoreEvent>(BIND_EVENT_FN(EditorLayer::OnWindowRestored));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
@@ -131,6 +118,39 @@ namespace Voxel {
 			}
 			return true;
 		}
+		return false;
+	}
+
+	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& event)
+	{
+		bool control = Input::IsKeyPressed(KeyCode::LeftControl) || Input::IsKeyPressed(KeyCode::RightControl);
+		bool shift = Input::IsKeyPressed(KeyCode::LeftShift) || Input::IsKeyPressed(KeyCode::RightShift);
+		bool alt = Input::IsKeyPressed(KeyCode::LeftAlt) || Input::IsKeyPressed(KeyCode::RightAlt);
+
+		if (alt) return false; // If the User is moving the editor camera, don't mouse pick
+
+		m_Framebuffer->Bind();
+
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+		auto [mouseX, mouseY] = ImGui::GetMousePos();
+		mouseX -= m_ViewportBounds[0].x;
+		mouseY -= viewportSize.y;
+		mouseY = m_ViewportBounds[0].y - mouseY; // Invert for OpenGL
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < viewportSize.x && mouseY < viewportSize.y)
+		{
+			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+
+			// TODO: If control is pressed, add entity to selection context
+
+			m_PropertiesPanel->SetContext(
+				pixelData == -1 ? Entity() : Entity( (entt::entity)pixelData, m_ActiveScene.get() )
+			);
+
+			return true;
+		}
+
+		m_Framebuffer->Unbind();
 		return false;
 	}
 

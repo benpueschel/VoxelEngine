@@ -11,6 +11,7 @@ IncludeDir["ImGui"] 			= "%{VOXEL_VENDOR}/ImGui"
 IncludeDir["ImTerm"] 			= "%{VOXEL_VENDOR}/ImTerm/include"
 IncludeDir["entt"]				= "%{VOXEL_VENDOR}/entt/include"
 IncludeDir["yaml_cpp"] 			= "%{VOXEL_VENDOR}/yaml-cpp/include"
+IncludeDir["ImGuizmo"] 			= "%{VOXEL_VENDOR}/ImGuizmo"
 IncludeDir["VulkanSDK"]			= "%{VULKAN_SDK}/Include"
 
 LibraryDir = {}

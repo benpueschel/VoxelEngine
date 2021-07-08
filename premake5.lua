@@ -24,6 +24,7 @@ group "Dependencies"
 	include "Voxel/vendor/glfw"
 	include "Voxel/vendor/GLAD"
 	include "Voxel/vendor/ImGui"
+	include "Voxel/vendor/ImGuizmo"
 	include "Voxel/vendor/yaml-cpp"
 
 group ""

@@ -9,11 +9,14 @@ namespace Voxel {
 
 	struct QuadVertex
 	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-		glm::vec2 TexCoord;
-		float TexIndex;
-		glm::vec2 TexScale;
+		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
+		glm::vec4 Color = { 1.0f , 1.0f , 1.0f, 1.0f };
+		glm::vec2 TexCoord = { 0.0f, 0.0f };
+		float TexIndex = 0;
+		glm::vec2 TexScale = { 1.0f, 1.0f };
+
+		// Editor-only
+		int EntityID = -1;
 	};
 
 	struct RenderData2D
@@ -69,6 +72,7 @@ namespace Voxel {
 			{ ShaderDataType::Float2, "_TexCoord" },
 			{ ShaderDataType::Float,  "_TexIndex" },
 			{ ShaderDataType::Float2, "_TexScale" },
+			{ ShaderDataType::Int,	  "_EntityID" },
 		});
 		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
@@ -161,17 +165,22 @@ namespace Voxel {
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 	}
 
-	void Renderer2D::DrawQuad(glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& spriteRenderer, int entityID)
 	{
-		DrawQuad(transform, nullptr, color);
+		DrawQuad(transform, spriteRenderer.Color, entityID);
 	}
 
-	void Renderer2D::DrawQuad(glm::mat4& transform, const Ref<Texture2D>& texture)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID)
 	{
-		DrawQuad(transform, texture, glm::vec4(1.0f));
+		DrawQuad(transform, nullptr, color, entityID);
 	}
 
-	void Renderer2D::DrawQuad(glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int entityID)
+	{
+		DrawQuad(transform, texture, glm::vec4(1.0f), entityID);
+	}
+
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& color, int entityID)
 	{
 		PROFILE_FUNCTION();
 
@@ -213,6 +222,7 @@ namespace Voxel {
 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = static_cast<float>(textureIndex);
 			s_Data.QuadVertexBufferPtr->TexScale = textureScale;
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 			s_Data.QuadVertexBufferPtr++;
 		}
 

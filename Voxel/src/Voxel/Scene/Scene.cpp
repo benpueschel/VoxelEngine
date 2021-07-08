@@ -47,7 +47,7 @@ namespace Voxel {
 		for (auto entity : group)
 		{
 			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			Renderer2D::DrawQuad((glm::mat4)transform, sprite.Color);
+			Renderer2D::DrawSprite(transform.GetTransform(), sprite.Color, (int)entity);
 		}
 		Renderer2D::EndScene();
 	}
@@ -79,7 +79,7 @@ namespace Voxel {
 			for (auto entity : group)
 			{
 				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				Renderer2D::DrawQuad((glm::mat4) transform, sprite.Color);
+				Renderer2D::DrawSprite(transform.GetTransform(), sprite.Color, (int) entity);
 			}
 			Renderer2D::EndScene();
 		}
