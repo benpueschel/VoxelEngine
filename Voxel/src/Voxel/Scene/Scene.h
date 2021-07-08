@@ -5,6 +5,8 @@
 
 #include "entt.hpp"
 
+#include <filesystem>
+
 namespace Voxel {
 
 	class Entity;
@@ -27,12 +29,16 @@ namespace Voxel {
 		void SetName(const std::string& name);
 		std::string& GetName();
 
+		void SetSavePath(const std::filesystem::path& savePath) { m_SavePath = savePath; }
+		std::filesystem::path& GetSavePath() { return m_SavePath; }
+
 		static Ref<Scene>& Scene::LoadScene(const std::string& path);
 		static Ref<Scene>& Scene::SampleScene();
 	private:
 		entt::registry m_Registry;
 		std::string m_Name;
-		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+		std::filesystem::path m_SavePath = std::filesystem::path();
+		uint32_t m_ViewportWidth = 1, m_ViewportHeight = 1;
 
 		friend class Entity;
 		friend class SceneSerializer;

@@ -31,7 +31,7 @@ namespace Voxel {
 	{
 		Entity entity = Entity(m_Registry.create(), this);
 		entity.AddComponent<TransformComponent>();
-		entity.AddComponent<TagComponent>(name);
+		entity.AddComponent<EntityTagComponent>(name);
 		return entity;
 	}
 

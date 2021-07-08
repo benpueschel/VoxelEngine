@@ -1,39 +1,7 @@
 #include <pch.h>
-#include "Components.h"
-
-#include <imgui.h>
-#include <misc/cpp/imgui_stdlib.h>
-#include "Voxel/ImGui/UILibrary.h"
-
-#define GLM_ENABLE_EXPERIMENTAL
-
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
-#include <glm/gtc/quaternion.hpp>
+#include "Camera.h"
 
 namespace Voxel {
-
-	void TagComponent::OnImGuiRender()
-	{
-		ImGui::SameLine();
-		ImGui::InputText("##Tag", &Tag);
-	}
-
-	void TransformComponent::OnImGuiRender()
-	{
-		UI::DrawVec3Control("Position", LocalPosition);
-		
-		glm::vec3 rotation = glm::degrees(LocalRotation);
-		UI::DrawVec3Control("Rotation", rotation);
-		LocalRotation = glm::radians(rotation);
-
-		UI::DrawVec3Control("Scale", LocalScale, 1.0f, 0.001f);
-	}
-
-	void SpriteRendererComponent::OnImGuiRender()
-	{
-		ImGui::ColorEdit4("Color", glm::value_ptr(Color));
-	}
 
 	void CameraComponent::OnImGuiRender()
 	{
@@ -41,7 +9,7 @@ namespace Voxel {
 
 		const char* projections[] = { "Perspective", "Orthographic" };
 		const char* currentProjection = projections[static_cast<uint32_t>(Camera.GetProjectionType())];
-		if(ImGui::BeginCombo("Projection", currentProjection))
+		if (ImGui::BeginCombo("Projection", currentProjection))
 		{
 			for (uint32_t i = 0; i < sizeof(projections) / sizeof(projections[0]); i++)
 			{
@@ -74,11 +42,6 @@ namespace Voxel {
 					Camera.RecalculateProjection();
 				break;
 		}
-
-	}
-
-	void NativeScriptComponent::OnImGuiRender()
-	{
 	}
 
 }
