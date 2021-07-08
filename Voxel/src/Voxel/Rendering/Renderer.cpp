@@ -5,7 +5,6 @@
 #include "Voxel/Rendering/2D/Renderer2D.h"
 
 #include "Voxel/Scene/Entity.h"
-#include "Voxel/Scene/Components/Components.h"
 
 namespace Voxel {
 
@@ -56,17 +55,17 @@ namespace Voxel {
 
 		auto& transform = entity.GetComponent<TransformComponent>();
 
-		if (entity.HasComponent<VoxelRendererComponent>())
-		{
-			// Render voxels
-			auto& renderer = entity.GetComponent<VoxelRendererComponent>();
-			auto& shader = renderer.Material.GetShader();
+		//if (entity.HasComponent<VoxelRendererComponent>())
+		//{
+		//	// Render voxels
+		//	auto& renderer = entity.GetComponent<VoxelRendererComponent>();
+		//	auto& shader = renderer.Material.GetShader();
 
-			shader->Bind();
-			shader->SetMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
-			shader->SetMat4("u_Transform", transform);
+		//	shader->Bind();
+		//	shader->SetMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
+		//	shader->SetMat4("u_Transform", transform);
 
-		}
+		//}
 	}
 
 	void Renderer::Submit(Entity& entity, const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray)
