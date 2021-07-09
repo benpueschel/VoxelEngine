@@ -103,7 +103,7 @@ namespace Voxel {
 
 		GLuint program = glCreateProgram();
 
-		CORE_ASSERT((bool)(shaderSources.size() <= 2), "Shader '" + m_Name + "' exceeds the maximum of 2 programs");
+		CORE_ASSERT((shaderSources.size() <= 2), "Shader '" + m_Name + "' exceeds the maximum of 2 programs");
 
 		std::array<GLuint, 2> glShaders;
 		int glShaderIndex = 0;

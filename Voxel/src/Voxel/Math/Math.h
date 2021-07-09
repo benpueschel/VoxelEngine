@@ -54,11 +54,15 @@ namespace Voxel::Math {
 
 	static bool DecomposeTransform(mat4& transform, vec3& position, vec3& rotation, vec3& scale)
 	{
+		// From glm::decompose in matrix_decompose.inl
+
+		using namespace glm;
 
 		mat4 LocalMatrix(transform);
 
 		// Normalize the matrix.
-		if (!NormalizeMatrix(LocalMatrix)) return false;
+		if (epsilonEqual(LocalMatrix[3][3], 0.0f, epsilon<float>()))
+			return false;
 
 		// First, isolate perspective.  This is the messiest.
 		if (
@@ -66,22 +70,23 @@ namespace Voxel::Math {
 			epsilonNotEqual(LocalMatrix[1][3], 0.0f, epsilon<float>()) ||
 			epsilonNotEqual(LocalMatrix[2][3], 0.0f, epsilon<float>()))
 		{
+			// Clear the perspective partition
 			LocalMatrix[0][3] = LocalMatrix[1][3] = LocalMatrix[2][3] = 0.0f;
 			LocalMatrix[3][3] = 1.0f;
 		}
 
 		// Next take care of translation (easy).
-		position = vec4(LocalMatrix[3]);
+		position = vec3(LocalMatrix[3]);
 		LocalMatrix[3] = vec4(0, 0, 0, LocalMatrix[3].w);
 
-		vec3 Row[3] = { glm::vec3(0.0f) }, Pdum3 = glm::vec3(0.0f);
+		vec3 Row[3], Pdum3;
 
 		// Now get scale and shear.
 		for (length_t i = 0; i < 3; ++i)
 			for (length_t j = 0; j < 3; ++j)
 				Row[i][j] = LocalMatrix[i][j];
 
-		// Compute Scale
+		// Compute X scale factor and normalize first row.
 		scale.x = length(Row[0]);
 		Row[0] = detail::scale(Row[0], 1.0f);
 		scale.y = length(Row[1]);
@@ -89,7 +94,6 @@ namespace Voxel::Math {
 		scale.z = length(Row[2]);
 		Row[2] = detail::scale(Row[2], 1.0f);
 
-		// Extract Rotation
 		rotation.y = asin(-Row[0][2]);
 		if (cos(rotation.y) != 0)
 		{
@@ -101,7 +105,6 @@ namespace Voxel::Math {
 			rotation.x = atan2(-Row[2][0], Row[1][1]);
 			rotation.z = 0;
 		}
-
 		return true;
 	}
 

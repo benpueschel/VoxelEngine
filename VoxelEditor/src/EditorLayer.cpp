@@ -106,10 +106,9 @@ namespace Voxel {
 
 		m_Framebuffer->ClearAttachment(1, -1);
 
-		if (m_ViewportFocused)
-		{
+		if (m_ViewportFocused && !ImGuizmo::IsUsing()) 
 			m_EditorCamera.OnUpdate(timestep);
-		}
+
 		m_EditorState.ActiveScene->OnUpdateEditor(timestep, m_EditorCamera);
 
 		m_Framebuffer->Unbind();
@@ -125,7 +124,8 @@ namespace Voxel {
 			if (event.Handled) return;
 		}
 
-		m_EditorCamera.OnEvent(event);
+		if(!ImGuizmo::IsUsing())
+			m_EditorCamera.OnEvent(event);
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -194,7 +194,7 @@ namespace Voxel {
 		mouseY -= viewportSize.y;
 		mouseY = m_ViewportBounds[0].y - mouseY; // Invert for OpenGL
 
-		//if (ImGuizmo::IsOver()) return false; // Hovering Gizmos, so ignore mouse click
+		if (ImGuizmo::IsOver()) return false; // Hovering Gizmos, so ignore mouse click
 
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < viewportSize.x && mouseY < viewportSize.y)
 		{

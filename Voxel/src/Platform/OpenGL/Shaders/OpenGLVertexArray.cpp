@@ -5,7 +5,7 @@
 
 namespace Voxel {
 
-	static GLenum GetBaseType(ShaderDataType type)
+	static GLenum GLBaseType(ShaderDataType type)
 	{
 		switch (type)
 		{
@@ -69,15 +69,32 @@ namespace Voxel {
 
 		for (const auto& element : layout)
 		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(
-				index,
-				element.GetComponentCount(),
-				GetBaseType(element.Type),
-				element.Normalized ? GL_TRUE : GL_FALSE,
-				layout.GetStride(),
-				(const void*) element.Offset
-			);
+			GLenum baseType = GLBaseType(element.Type);
+			switch (baseType)
+			{
+				case GL_INT:
+					glEnableVertexAttribArray(index);
+					glVertexAttribIPointer(
+						index,
+						element.GetComponentCount(),
+						GLBaseType(element.Type),
+						layout.GetStride(),
+						(const void*)element.Offset
+					);
+					break;
+
+				default:
+					glEnableVertexAttribArray(index);
+					glVertexAttribPointer(
+						index,
+						element.GetComponentCount(),
+						GLBaseType(element.Type),
+						element.Normalized ? GL_TRUE : GL_FALSE,
+						layout.GetStride(),
+						(const void*)element.Offset
+					);
+					break;
+			}
 			index++;
 		}
 
