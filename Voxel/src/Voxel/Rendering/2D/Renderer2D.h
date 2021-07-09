@@ -4,6 +4,8 @@
 #include "Voxel/Rendering/Materials/Texture.h"
 #include "Voxel/Rendering/EditorCamera.h"
 
+#include "Voxel/Scene/Components/Components.h"
+
 namespace Voxel {
 
 	class Renderer2D
@@ -17,10 +19,11 @@ namespace Voxel {
 		static void EndScene();
 		static void Flush();
 
+		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& spriteRenderer, int entityID);
 		// Primitive Submitting
-		static void DrawQuad(glm::mat4& transform, const glm::vec4& color);
-		static void DrawQuad(glm::mat4& transform, const Ref<Texture2D>& texture);
-		static void DrawQuad(glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& color);
+		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
+		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int entityID = -1);
+		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& color, int entityID = -1);
 	};
 
 }

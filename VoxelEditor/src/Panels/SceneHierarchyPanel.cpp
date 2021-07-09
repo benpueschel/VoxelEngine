@@ -4,39 +4,22 @@
 
 namespace Voxel {
 
-	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& context)
-	{
-		SetContext(context);
-	}
-
-	void SceneHierarchyPanel::SetContext(const Ref<Scene>& context)
-	{
-		m_Context = context;
-		if(m_Properties)
-			m_Properties->m_Context = {};
-	}
-
-	void SceneHierarchyPanel::SetPropertiesPanel(const Ref<PropertiesPanel>& panel)
-	{
-		m_Properties = panel;
-	}
-
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
-		ImGui::Begin("Scene Hierarchy");
+		ImGui::Begin(GetImGuiID().c_str());
 		
-		m_Context->m_Registry.each([=](auto entityID) {
-			Entity entity { entityID, m_Context.get() };
+		m_State.ActiveScene->m_Registry.each([=](auto entityID) {
+			Entity entity { entityID, m_State.ActiveScene.get() };
 			DrawEntityNode(entity);
 		});
 
 		//if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-		//	m_Properties->m_Context = {};
+		//	m_State.CurrentContext = {};
 
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
 			if (ImGui::MenuItem("Create Empty Entity"))
-				m_Context->CreateEntity("Empty Entity");
+				m_State.ActiveScene->CreateEntity("Empty Entity");
 
 			ImGui::EndPopup();
 		}
@@ -44,17 +27,22 @@ namespace Voxel {
 		ImGui::End();
 	}
 
+	void SceneHierarchyPanel::OnEvent(Event& event)
+	{
+
+	}
+
 	void SceneHierarchyPanel::DrawEntityNode(Entity& entity)
 	{
-		auto& tag = entity.GetComponent<TagComponent>();
+		auto& tag = entity.GetComponent<EntityTagComponent>();
 
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-		flags |= (m_Properties->m_Context == entity) ? ImGuiTreeNodeFlags_Selected : 0;
+		flags |= (m_State.CurrentContext == entity) ? ImGuiTreeNodeFlags_Selected : 0;
 
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t) entity, flags, tag.Tag.c_str());
 		if(ImGui::IsItemClicked())
-			m_Properties->SetContext(entity);
+			m_State.CurrentContext  = entity;
 
 		bool deleteEntity = false;
 		if (ImGui::BeginPopupContextItem())
@@ -78,9 +66,9 @@ namespace Voxel {
 
 		if (deleteEntity)
 		{
-			m_Context->DestroyEntity(entity);
-			if (m_Properties->m_Context == entity)
-				m_Properties->m_Context = {};
+			m_State.ActiveScene->DestroyEntity(entity);
+			if (m_State.CurrentContext == entity)
+				m_State.CurrentContext = {};
 		}
 
 	}
