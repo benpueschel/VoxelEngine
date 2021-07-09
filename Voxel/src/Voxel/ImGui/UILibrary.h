@@ -9,6 +9,8 @@ namespace Voxel::UI {
 	{
 		auto& colors = ImGui::GetStyle().Colors;
 
+		ImGui::GetStyle().FramePadding = { 4, 4 };
+
 		colors[ImGuiCol_WindowBg] = { 0.1f, 0.105f, 0.11f, 1.0f };
 
 		// Headers
@@ -33,6 +35,16 @@ namespace Voxel::UI {
 		colors[ImGuiCol_TitleBg] = { 0.15f, 0.1505f, 0.151f, 1.0f };
 		colors[ImGuiCol_TitleBgActive] = { 0.15f, 0.1505f, 0.151f, 1.0f };
 		colors[ImGuiCol_TitleBgCollapsed] = { 0.25f, 0.255f, 0.251f, 1.0f };
+	}
+
+	static ImVec2 GetButtonSize(const char* label)
+	{
+		ImVec2 labelSize = ImGui::CalcTextSize(label, nullptr, true);
+
+		return { 
+			labelSize.x + ImGui::GetStyle().FramePadding.x * 2.0f,
+			labelSize.y + ImGui::GetStyle().FramePadding.y * 2.0f
+		};
 	}
 
 	static void DrawVec3Control(const std::string& label, glm::vec3& value, float resetValue =  0.0f, 

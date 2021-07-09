@@ -7,37 +7,86 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "Panels/PropertiesPanel.h"
+#include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ViewportPanel.h"
+
 namespace Voxel {
 
+	template<typename Base, typename T>
+	const bool instanceof(const T*)
+	{
+		return std::is_base_of<Base, T>::value;
+	}
+
 	EditorLayer::EditorLayer()
-		: Layer("EditorLayer"), m_PropertiesPanel()
+		: Layer("EditorLayer")
 	{
 	}
 
 	void EditorLayer::OnAttach()
 	{
+		m_EditorState.ActiveScene = CreateRef<Scene>();
+		m_EditorState.CurrentContext = {};
+
 		FramebufferSpecification viewportSpec;
 		viewportSpec.Width = 1280;
 		viewportSpec.Height = 720;
-		viewportSpec.Attachments = { 
-			FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, 
-			FramebufferTextureFormat::Depth 
+		viewportSpec.Attachments = {
+			FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER,
+			FramebufferTextureFormat::Depth
 		};
 
 		m_Framebuffer = Framebuffer::Create(viewportSpec);
 
-		m_ActiveScene = CreateRef<Scene>();
+		auto propertiesPanel = CreateRef<PropertiesPanel>(m_EditorState);
+		auto sceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_EditorState);
+		//auto viewportPanel = CreateRef<ViewportPanel>(m_EditorState);
 
-		m_SceneHierarchyPanel = CreateRef<SceneHierarchyPanel>();
-		m_PropertiesPanel = CreateRef<PropertiesPanel>();
-		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
-		m_SceneHierarchyPanel->SetPropertiesPanel(m_PropertiesPanel);
+		m_Panels.push_back(sceneHierarchyPanel);
+		m_Panels.push_back(propertiesPanel);
+		//m_Panels.push_back(viewportPanel);
 	}
 
 	void EditorLayer::OnDetach()
 	{
 
 	}
+
+	/*void EditorLayer::OnUpdate(Timestep& timestep)
+	{
+		for (const auto& panel : m_Panels)
+		{
+			if(!instanceof<ViewportPanel>(panel.get())) continue;
+
+			ViewportPanel& panel = static_cast<ViewportPanel>(panel);
+			Ref<Framebuffer>& framebuffer = panel.m_Framebuffer;
+			ImVec2& viewportSize = panel.m_ViewportSize;
+
+			if(!panel.m_Active) continue;
+
+			if (panel.ShouldResize())
+			{
+				framebuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+				panel.m_Camera.SetViewportSize(viewportSize.x, viewportSize.y);
+			}
+			m_EditorState.ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+
+			framebuffer->Bind();
+
+			RenderCommand::SetClearColor({ 0.1f ,0.1f, 0.1f, 1.0f });
+			RenderCommand::Clear();
+
+			framebuffer->ClearAttachment(1, -1);
+
+			if (panel.m_Focused) 
+				panel.m_Camera.OnUpdate(timestep);
+
+			m_EditorState.ActiveScene->OnUpdateEditor(timestep, panel.m_Camera);
+
+			framebuffer->Unbind();
+		}
+	}*/
 
 	void EditorLayer::OnUpdate(Timestep& timestep)
 	{
@@ -47,7 +96,7 @@ namespace Voxel {
 		{
 			m_Framebuffer->Resize((uint32_t) m_ViewportSize.x, (uint32_t) m_ViewportSize.y);
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-			m_ActiveScene->OnViewportResize((uint32_t) m_ViewportSize.x, (uint32_t) m_ViewportSize.y);
+			m_EditorState.ActiveScene->OnViewportResize((uint32_t) m_ViewportSize.x, (uint32_t) m_ViewportSize.y);
 		}
 
 		m_Framebuffer->Bind();
@@ -55,27 +104,13 @@ namespace Voxel {
 		RenderCommand::SetClearColor({ 0.1f ,0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
 
+		m_Framebuffer->ClearAttachment(1, -1);
+
 		if (m_ViewportFocused)
 		{
 			m_EditorCamera.OnUpdate(timestep);
 		}
-		m_ActiveScene->OnUpdateEditor(timestep, m_EditorCamera);
-
-		if (Input::IsMouseButtonPressed(MouseButton::ButtonLeft))
-		{
-
-			glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
-			auto [mouseX, mouseY] = ImGui::GetMousePos();
-			mouseX -= m_ViewportBounds[0].x;
-			mouseY -= viewportSize.y;
-			mouseY = m_ViewportBounds[0].y - mouseY; // Invert for OpenGL
-
-			if (mouseX >= 0 && mouseY >= 0 && mouseX < viewportSize.x && mouseY < viewportSize.y)
-			{
-				int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-				LOG_CORE_DEBUG("Pixel Data: {0}", pixelData);
-			}
-		}
+		m_EditorState.ActiveScene->OnUpdateEditor(timestep, m_EditorCamera);
 
 		m_Framebuffer->Unbind();
 	}
@@ -84,11 +119,18 @@ namespace Voxel {
 	{
 		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
+		for (const auto& panel : m_Panels)
+		{
+			panel->OnEvent(event);
+			if (event.Handled) return;
+		}
+
 		m_EditorCamera.OnEvent(event);
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<WindowRestoreEvent>(BIND_EVENT_FN(EditorLayer::OnWindowRestored));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
@@ -113,6 +155,8 @@ namespace Voxel {
 				case KeyCode::S:
 					if (control && shift)
 						SaveSceneAs();
+					else if (control)
+						SaveScene();
 					break;
 
 				// Gizmos
@@ -134,6 +178,40 @@ namespace Voxel {
 		return false;
 	}
 
+	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& event)
+	{
+		bool control = Input::IsKeyPressed(KeyCode::LeftControl) || Input::IsKeyPressed(KeyCode::RightControl);
+		bool shift = Input::IsKeyPressed(KeyCode::LeftShift) || Input::IsKeyPressed(KeyCode::RightShift);
+		bool alt = Input::IsKeyPressed(KeyCode::LeftAlt) || Input::IsKeyPressed(KeyCode::RightAlt);
+
+		if (alt) return false; // If the User is moving the editor camera, don't mouse pick
+
+		m_Framebuffer->Bind();
+
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+		auto [mouseX, mouseY] = ImGui::GetMousePos();
+		mouseX -= m_ViewportBounds[0].x;
+		mouseY -= viewportSize.y;
+		mouseY = m_ViewportBounds[0].y - mouseY; // Invert for OpenGL
+
+		//if (ImGuizmo::IsOver()) return false; // Hovering Gizmos, so ignore mouse click
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < viewportSize.x && mouseY < viewportSize.y)
+		{
+			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+
+			// TODO: If control is pressed, add entity to selection context
+
+			m_EditorState.CurrentContext = pixelData == -1 ? Entity{}
+				: Entity{ (entt::entity)pixelData, m_EditorState.ActiveScene.get() };
+
+			return true;
+		}
+
+		m_Framebuffer->Unbind();
+		return false;
+	}
+
 	bool EditorLayer::OnWindowRestored(WindowRestoreEvent& event)
 	{
 		m_ViewportSize = { (float)event.GetWidth(), (float)event.GetHeight() };
@@ -143,39 +221,48 @@ namespace Voxel {
 
 	void EditorLayer::NewScene()
 	{
-		m_ActiveScene = CreateRef<Scene>();
+		m_EditorState.ActiveScene = CreateRef<Scene>();
 		m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
+		m_EditorState.ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 	}
+
 	void EditorLayer::OpenScene()
 	{
 		auto& path = FileDialogs::OpenFile(VOXEL_SCENE_FILE_FILTER);
 		if (!path.empty())
 		{
-			m_ActiveScene = CreateRef<Scene>();
-			SceneSerializer serializer(m_ActiveScene);
+			m_EditorState.ActiveScene = CreateRef<Scene>();
+			SceneSerializer serializer(m_EditorState.ActiveScene);
 			serializer.DeserializeText(path);
-			m_SceneHierarchyPanel->SetContext(m_ActiveScene);
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			Application::Get().GetWindow().SetTitle("VoxelEditor - " + m_ActiveScene->GetName());
+			m_EditorState.ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			Application::Get().GetWindow().SetTitle("VoxelEditor - " + m_EditorState.ActiveScene->GetName());
 		}
 	}
 	void EditorLayer::SaveScene()
 	{
+		if (m_EditorState.ActiveScene->GetSavePath().empty())
+		{
+			SaveSceneAs();
+			return;
+		}
 
+		SceneSerializer serializer(m_EditorState.ActiveScene);
+		serializer.SerializeText(m_EditorState.ActiveScene->GetSavePath());
+		Application::Get().GetWindow().SetTitle("VoxelEditor - " + m_EditorState.ActiveScene->GetName());
 	}
+
 	void EditorLayer::SaveSceneAs()
 	{
 		auto& path = FileDialogs::SaveFile(VOXEL_SCENE_FILE_FILTER);
 		if (!path.empty())
 		{
 			auto& sceneName = path.stem().string();
-			m_ActiveScene->SetName(sceneName);
+			m_EditorState.ActiveScene->SetName(sceneName);
+			m_EditorState.ActiveScene->SetSavePath(path);
 
-			SceneSerializer serializer(m_ActiveScene);
+			SceneSerializer serializer(m_EditorState.ActiveScene);
 			serializer.SerializeText(path);
-			Application::Get().GetWindow().SetTitle("VoxelEditor - " + m_ActiveScene->GetName());
+			Application::Get().GetWindow().SetTitle("VoxelEditor - " + m_EditorState.ActiveScene->GetName());
 		}
 	}
 
@@ -206,7 +293,7 @@ namespace Voxel {
 		// all active windows docked into it will lose their parent and become undocked.
 		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
 		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-		ImGui::Begin("DockSpace Demo", nullptr, window_flags);
+		ImGui::Begin("Dockspace", nullptr, window_flags); // Dockspace
 
 		ImGui::PopStyleVar(2);
 
@@ -232,7 +319,10 @@ namespace Voxel {
 				if (ImGui::MenuItem("Open...", "Ctrl+O"))
 					OpenScene();
 
-				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+				if (ImGui::MenuItem("Save...", "Ctrl+S"))
+					SaveScene();
+
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
 					SaveSceneAs();
 
 				if (ImGui::MenuItem("Close"))
@@ -241,22 +331,43 @@ namespace Voxel {
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Window"))
+			{
+				if (ImGui::BeginMenu("Panels"))
+				{
+					if (ImGui::MenuItem("Properties"))
+						m_Panels.push_back(CreateRef<PropertiesPanel>(m_EditorState));
+					if (ImGui::MenuItem("Scene Hierarchy"))
+						m_Panels.push_back(CreateRef<SceneHierarchyPanel>(m_EditorState));
+
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenuBar();
 		}
 
-		m_SceneHierarchyPanel->OnImGuiRender();
-		m_PropertiesPanel->OnImGuiRender();
+		for (auto& panel : m_Panels)
+			panel->OnImGuiRender();
 
 		ImGui::Begin("Debug");
 
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 
+			1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
 		ImGui::End();
 
-		// Viewport
 
+		// Viewport
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
 		ImGui::Begin("Viewport");
-		auto viewportOffset = ImGui::GetCursorPos();
+
+		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+		auto viewportOffset = ImGui::GetWindowPos();
+		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
@@ -266,19 +377,8 @@ namespace Voxel {
 		uint32_t textureID = m_Framebuffer->GetColorAttachments()[0];
 		ImGui::Image((void*)textureID, m_ViewportSize, { 0, 1 }, { 1, 0 });
 
-		ImVec2 windowSize = ImGui::GetWindowSize();
-		ImVec2 minBound = ImGui::GetWindowPos();
-		minBound.x += viewportOffset.x;
-		minBound.y += viewportOffset.y;
-
-		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
-		m_ViewportBounds[0].x = minBound.x;
-		m_ViewportBounds[0].y = minBound.y;
-		m_ViewportBounds[1].x = maxBound.x;
-		m_ViewportBounds[1].y = maxBound.y;
-
 		// Gizmos
-		Entity& selectedEntity = m_SceneHierarchyPanel->GetPropertiesPanel()->GetContext();
+		Entity& selectedEntity = m_EditorState.CurrentContext;
 		if (selectedEntity && selectedEntity.HasComponent<TransformComponent>() && m_GizmoType != -1)
 		{
 			ImGuizmo::SetOrthographic(false);
@@ -286,8 +386,11 @@ namespace Voxel {
 
 			ImVec2 pos = ImGui::GetWindowPos();
 			ImVec2 size = ImGui::GetWindowSize();
-			ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
-
+			ImGuizmo::SetRect(
+				m_ViewportBounds[0].x, m_ViewportBounds[0].y,
+				m_ViewportBounds[1].x - m_ViewportBounds[0].x,
+				m_ViewportBounds[1].y - m_ViewportBounds[0].y
+			);
 			const glm::mat4& view = m_EditorCamera.GetViewMatrix();
 			const glm::mat4& projection = m_EditorCamera.GetProjection();
 
@@ -326,9 +429,10 @@ namespace Voxel {
 
 		ImGui::End();
 		ImGui::PopStyleVar();
+		// Viewport
 
 
-		ImGui::End();
+		ImGui::End(); // Dockspace
 	}
 
 }

@@ -4,9 +4,9 @@
 
 #include <ImGui/imgui.h>
 #include <imterm/terminal.hpp>
-#include "Panels/SceneHierarchyPanel.h"
-#include "Panels/PropertiesPanel.h"
-#include "Panels/LogPanel.h"
+
+#include "Panels/Panel.h"
+#include "EditorState.h"
 
 #include "Voxel/Rendering/EditorCamera.h"
 
@@ -25,8 +25,9 @@ namespace Voxel {
 
 		virtual void OnImGuiRender();
 	private:
-		bool EditorLayer::OnKeyPressed(KeyPressedEvent& event);
-		bool EditorLayer::OnWindowRestored(WindowRestoreEvent& event);
+		bool OnKeyPressed(KeyPressedEvent& event);
+		bool OnMouseButtonPressed(MouseButtonPressedEvent& event);
+		bool OnWindowRestored(WindowRestoreEvent& event);
 
 		void NewScene();
 		void OpenScene();
@@ -35,19 +36,16 @@ namespace Voxel {
 	private:
 		Ref<Framebuffer> m_Framebuffer;
 		ImVec2 m_ViewportSize;
-		glm::vec2 m_ViewportBounds[2];
+		glm::vec2 m_ViewportBounds[2] = { glm::vec2(0.0f) };
 		bool m_ViewportFocused = true;
 		bool m_ViewportHovered = false;
 
+		EditorState m_EditorState;
 		EditorCamera m_EditorCamera;
-
-		Ref<Scene> m_ActiveScene;
 
 		int m_GizmoType = -1;
 
-		Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
-		Ref<PropertiesPanel> m_PropertiesPanel;
-		//LogPanel m_LogPanel;
+		std::vector<Ref<Panel>> m_Panels;
 	};
 
 }

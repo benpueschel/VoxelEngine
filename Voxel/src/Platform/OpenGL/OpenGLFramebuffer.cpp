@@ -16,6 +16,24 @@ namespace Voxel {
 		return false;
 	}
 
+	static GLenum GLTextureFormat(FramebufferTextureFormat& format)
+	{
+		switch (format)
+		{
+			case FramebufferTextureFormat::RGBA8:
+				return GL_RGBA8;
+
+			case FramebufferTextureFormat::RED_INTEGER:
+				return GL_RED_INTEGER;
+
+			case FramebufferTextureFormat::DEPTH24_STENCIL8:
+				return GL_DEPTH24_STENCIL8;
+
+		}
+		CORE_ASSERT(false, "Unknown Format");
+		return 0;
+	}
+
 	static GLenum TextureTarget(bool multisample)
 	{
 		return multisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
@@ -93,7 +111,7 @@ namespace Voxel {
 			if (!IsDepthFormat(format.TextureFormat))
 				m_ColorAttachmentSpecs.emplace_back(format);
 			else
-				m_ColorAttachmentSpecs.emplace_back(format);
+				m_DepthAttachmentSpecs.emplace_back(format);
 		}
 
 		Invalidate();
@@ -198,10 +216,24 @@ namespace Voxel {
 		return data;
 	}
 
+	void OpenGLFramebuffer::ClearAttachment(uint32_t attachmentIndex, int value)
+	{
+		CORE_ASSERT((attachmentIndex < m_ColorAttachments.size()), "Index out of bounds");
+
+		auto& specification = m_ColorAttachmentSpecs[attachmentIndex];
+
+		glClearTexImage(
+			m_ColorAttachments[attachmentIndex], 0,
+			GLTextureFormat(specification.TextureFormat),
+			GL_INT, &value
+		);
+	}
+
 	void OpenGLFramebuffer::Bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 		glViewport(0, 0, m_Specification.Width, m_Specification.Height);
+
 	}
 
 	void OpenGLFramebuffer::Unbind()

@@ -117,11 +117,11 @@ namespace Voxel {
 		out << BeginMap;
 		out << Key << "Entity" << Value << (uint32_t)entity;
 
-		if (entity.HasComponent<TagComponent>())
+		if (entity.HasComponent<EntityTagComponent>())
 		{
 			out << Key << "TagComponent" << Value << BeginMap;
 
-			auto& tag = entity.GetComponent<TagComponent>().Tag;
+			auto& tag = entity.GetComponent<EntityTagComponent>().Tag;
 			out << Key << "Tag" << Value << tag;
 
 			out << EndMap;

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Panel.h"
+#include "../EditorState.h"
+
 #include "SceneHierarchyPanel.h"
 #include "Voxel/Scene/Entity.h"
 
@@ -7,29 +10,25 @@
 
 namespace Voxel {
 
-	class PropertiesPanel
+	class PropertiesPanel : public Panel
 	{
 	public:
-		PropertiesPanel() = default;
-		PropertiesPanel(Entity& context)
-			: m_Context(context) { }
+		PropertiesPanel(EditorState& state)
+			: m_State(state), Panel("Properties") { }
 
-		void SetContext(Entity& context)
-		{
-			m_Context = context;
-		}
+		virtual void OnImGuiRender() override;
+		virtual void OnEvent(Event& event) override;
 
-		void OnImGuiRender();
+		void Lock(bool locked) { m_Locked = locked; }
 
-		Entity& GetContext() { return m_Context; }
 	private:
 		//TODO: Move "removable" to the component
 		template<typename Component>
 		void DrawComponent(const char* name, int treeNodeFlags, bool removable = true);
 	private:
+		bool m_Locked = false;
 		Entity m_Context;
-
-		friend class SceneHierarchyPanel;
+		EditorState& m_State;
 	};
 
 }

@@ -1,43 +1,43 @@
 // Basic Texture Shader
 
 #type vertex
-#version 330 core	
+#version 450	
 
 layout(location = 0) in vec3 _Position;
 layout(location = 1) in vec4 _Color;
 layout(location = 2) in vec2 _TexCoord;
 layout(location = 3) in float _TexIndex;
 layout(location = 4) in vec2 _TexScale;
+layout(location = 5) in int _EntityID;
 
 uniform mat4 u_ViewProjection;
-uniform mat4 u_Transform;
 
 out vec4 v_Color;
 out vec2 v_TexCoord;
 out float v_TexIndex;
 out vec2 v_TexScale;
-out int v_EntityID;
+out flat int v_EntityID;
 
 void main() {
 	v_TexCoord = _TexCoord;
 	v_TexIndex = _TexIndex;
 	v_TexScale = _TexScale;
 	v_Color = _Color;
-	v_EntityID = 0;
+	v_EntityID = _EntityID;
 	gl_Position = u_ViewProjection * vec4(_Position, 1.0);
 }
 
 #type fragment
-#version 330 core
+#version 450
 
 layout(location = 0) out vec4 color;
-layout(location = 1) out int entities;
+layout(location = 1) out int entityID;
 
 in vec4 v_Color;
 in vec2 v_TexCoord;
 in float v_TexIndex;
 in vec2 v_TexScale;
-in int v_EntityID;
+in flat int v_EntityID;
 
 uniform sampler2D u_Textures[32];
 			
@@ -80,6 +80,5 @@ void main() {
 	}
 
 	color = texColor;
-	entities = v_EntityID;
-
+	entityID = v_EntityID;
 }

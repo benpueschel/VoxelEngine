@@ -31,7 +31,7 @@ namespace Voxel {
 	{
 		Entity entity = Entity(m_Registry.create(), this);
 		entity.AddComponent<TransformComponent>();
-		entity.AddComponent<TagComponent>(name);
+		entity.AddComponent<EntityTagComponent>(name);
 		return entity;
 	}
 
@@ -47,7 +47,7 @@ namespace Voxel {
 		for (auto entity : group)
 		{
 			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			Renderer2D::DrawQuad((glm::mat4)transform, sprite.Color);
+			Renderer2D::DrawSprite(transform.GetTransform(), sprite.Color, (int)entity);
 		}
 		Renderer2D::EndScene();
 	}
@@ -79,7 +79,7 @@ namespace Voxel {
 			for (auto entity : group)
 			{
 				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				Renderer2D::DrawQuad((glm::mat4) transform, sprite.Color);
+				Renderer2D::DrawSprite(transform.GetTransform(), sprite.Color, (int) entity);
 			}
 			Renderer2D::EndScene();
 		}
