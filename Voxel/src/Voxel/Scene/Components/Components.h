@@ -6,3 +6,4 @@
 #include "NativeScript.h"
 #include "SpriteRenderer.h"
 #include "Transform.h"
+#include "EntityRelationship.h"
