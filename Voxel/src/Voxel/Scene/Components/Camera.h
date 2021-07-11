@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Voxel/Scene/SceneCamera.h"
-#include <Imgui.h>
+#include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Voxel {
