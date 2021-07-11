@@ -5,6 +5,7 @@
 #include "Voxel/Rendering/2D/Renderer2D.h"
 
 #include "Voxel/Scene/Entity.h"
+#include "Voxel/Scene/Components/Transform.h"
 
 namespace Voxel {
 

@@ -4,7 +4,7 @@
 #include "Voxel/Rendering/Materials/Texture.h"
 #include "Voxel/Rendering/EditorCamera.h"
 
-#include "Voxel/Scene/Components/Components.h"
+#include "Voxel/Scene/Components/SpriteRenderer.h"
 
 namespace Voxel {
 
