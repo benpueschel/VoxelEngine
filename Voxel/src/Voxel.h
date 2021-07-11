@@ -37,6 +37,7 @@
 // ----------------- Im Gui -----------------
 
 #include "Voxel/ImGui/ImGuiLayer.h"
+#include "Voxel/ImGui/UILibrary.h"
 
 // ------------ Entity-Component ------------
 
@@ -45,8 +46,6 @@
 #include "Voxel/Scene/Components/Components.h"
 
 #include "Voxel/Scene/ScriptableEntity.h"
-
-// ------------------------------------------
 
 // ------------------ Utils -----------------
 
