@@ -17,8 +17,10 @@ namespace Voxel {
 
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& event) override;
-
+		
 	private:
+		bool OnKeyPressed(KeyPressedEvent& event);
+
 		void DrawEntityNode(Entity& entity);
 	private:
 		EditorState& m_State;

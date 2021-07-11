@@ -9,8 +9,12 @@ namespace Voxel {
 		ImGui::Begin(GetImGuiID().c_str());
 		
 		m_State.ActiveScene->m_Registry.each([=](auto entityID) {
-			Entity entity { entityID, m_State.ActiveScene.get() };
-			DrawEntityNode(entity);
+			Entity entity{ entityID, m_State.ActiveScene.get() };
+			if (!entity.HasComponent<EntityRelationshipComponent>()) return;
+
+			auto& relationship = entity.GetComponent<EntityRelationshipComponent>();
+			if(!relationship.Parent)
+				DrawEntityNode(entity);
 		});
 
 		//if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -29,11 +33,30 @@ namespace Voxel {
 
 	void SceneHierarchyPanel::OnEvent(Event& event)
 	{
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(SceneHierarchyPanel::OnKeyPressed));
+	}
 
+	bool SceneHierarchyPanel::OnKeyPressed(KeyPressedEvent& event)
+	{
+		switch (event.GetKeyCode())
+		{
+			case KeyCode::Delete:
+				if (m_State.CurrentContext)
+				{
+					m_State.ActiveScene->DestroyEntity(m_State.CurrentContext);
+					m_State.CurrentContext = {};
+					return true;
+				}
+				break;
+		}
+
+		return false;
 	}
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity& entity)
 	{
+		auto& relationship = entity.GetComponent<EntityRelationshipComponent>();
 		auto& tag = entity.GetComponent<EntityTagComponent>();
 
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
@@ -44,31 +67,54 @@ namespace Voxel {
 		if(ImGui::IsItemClicked())
 			m_State.CurrentContext  = entity;
 
-		bool deleteEntity = false;
 		if (ImGui::BeginPopupContextItem())
 		{
 			if (ImGui::MenuItem("Delete Entity"))
-				deleteEntity = true;
+			{
+				m_State.ActiveScene->DestroyEntity(entity);
+				if (m_State.CurrentContext == entity)
+					m_State.CurrentContext = {};
+			}
 
 			ImGui::EndPopup();
 		}
 
 		if (opened)
 		{
-			/*for (auto* child : entity.GetChildren())
+			if (m_State.CurrentContext && relationship.FirstChild)
 			{
-				DrawEntityNode(*child);
-				ImGui::TreePop();
-			}*/
+				Entity& currentChild = relationship.FirstChild;
+				DrawEntityNode(currentChild);
+				for (size_t i = 0; i < relationship.Children - 1; i++)
+				{
+					currentChild = currentChild.GetOrAddComponent<EntityRelationshipComponent>().Next;
+					DrawEntityNode(currentChild);
+				}
+
+			}
 
 			ImGui::TreePop();
 		}
 
-		if (deleteEntity)
+		if (ImGui::BeginDragDropSource())
 		{
-			m_State.ActiveScene->DestroyEntity(entity);
-			if (m_State.CurrentContext == entity)
-				m_State.CurrentContext = {};
+			ImGui::SetDragDropPayload(GetName(), &entity, sizeof(entity));
+			ImGui::Text(tag.Tag.c_str());
+			ImGui::EndDragDropSource();
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(GetName());
+			if(payload && payload->Data)
+			{
+				Entity* draggedEntity = (Entity*) payload->Data;
+				auto& dr = draggedEntity->GetOrAddComponent<EntityRelationshipComponent>();
+				dr.SetParent(*draggedEntity, entity);
+				LOG_INFO("Dropped Entity!");
+			}
+
+			ImGui::EndDragDropTarget();
 		}
 
 	}
