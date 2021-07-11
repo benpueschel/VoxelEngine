@@ -12,14 +12,17 @@ namespace Voxel {
 		size_t Children = 0;
 		Entity FirstChild = {};
 
-		Entity Previous = {};
 		Entity Next = {};
 		Entity Parent = {};
 
 		EntityRelationshipComponent() = default;
-
-		void SetParent(Entity& entity, Entity& parent);
 		void OnImGuiRender();
+
+		static void AddChild(Entity& parent, Entity& child, int index = -1);
+		static void SetParent(Entity& entity, Entity& parent);
+
+		Entity GetChildAt(int index);
+		Entity operator[](size_t index) { return GetChildAt((int)index); }
 	};
 
 }

@@ -20,7 +20,7 @@ namespace Voxel {
 		//if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 		//	m_State.CurrentContext = {};
 
-		if (ImGui::BeginPopupContextWindow(0, 1, false))
+		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
 		{
 			if (ImGui::MenuItem("Create Empty Entity"))
 				m_State.ActiveScene->CreateEntity("Empty Entity");
@@ -83,12 +83,11 @@ namespace Voxel {
 		{
 			if (m_State.CurrentContext && relationship.FirstChild)
 			{
-				Entity& currentChild = relationship.FirstChild;
-				DrawEntityNode(currentChild);
-				for (size_t i = 0; i < relationship.Children - 1; i++)
+				Entity currentChild = relationship.FirstChild;
+				while(currentChild)
 				{
-					currentChild = currentChild.GetOrAddComponent<EntityRelationshipComponent>().Next;
 					DrawEntityNode(currentChild);
+					currentChild = currentChild.GetOrAddComponent<EntityRelationshipComponent>().Next;
 				}
 
 			}
@@ -109,8 +108,7 @@ namespace Voxel {
 			if(payload && payload->Data)
 			{
 				Entity* draggedEntity = (Entity*) payload->Data;
-				auto& dr = draggedEntity->GetOrAddComponent<EntityRelationshipComponent>();
-				dr.SetParent(*draggedEntity, entity);
+				EntityRelationshipComponent::SetParent(*draggedEntity, entity);
 				LOG_INFO("Dropped Entity!");
 			}
 
