@@ -235,6 +235,7 @@ namespace Voxel {
 			SceneSerializer serializer(m_EditorState.ActiveScene);
 			serializer.DeserializeText(path);
 			m_EditorState.ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_EditorState.CurrentContext = {};
 			Application::Get().GetWindow().SetTitle("VoxelEditor - " + m_EditorState.ActiveScene->GetName());
 		}
 	}
