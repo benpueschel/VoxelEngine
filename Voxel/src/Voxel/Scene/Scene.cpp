@@ -54,25 +54,22 @@ namespace Voxel {
 
 	void Scene::OnUpdateRuntime(Timestep timestep)
 	{
-		if (!Application::Get().GetImGuiLayer()->IsBlockingEvents())
-		{
-			m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& script) {
-				if (!script.Instance)
-				{
-					script.Instance = script.InstantiateScript();
-					script.Instance->m_Entity = { entity, this };
-					script.Instance->OnCreate();
-				}
+		m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& script) {
+			if (!script.Instance)
+			{
+				script.Instance = script.InstantiateScript();
+				script.Instance->m_Entity = { entity, this };
+				script.Instance->OnCreate();
+			}
 
-				script.Instance->OnUpdate(timestep);
-			});
-		}
+			script.Instance->OnUpdate(timestep);
+		});
 
 		Entity mainCameraEntity = GetPrimaryCamera();
 		if (mainCameraEntity)
 		{
 			Camera& mainCamera = mainCameraEntity.GetComponent<CameraComponent>().Camera;
-			glm::mat4& mainCameraTransform = mainCameraEntity.GetComponent<TransformComponent>();
+			glm::mat4 mainCameraTransform = mainCameraEntity.GetComponent<TransformComponent>();
 
 			Renderer2D::BeginScene(mainCamera.GetProjection(), mainCameraTransform);
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);

@@ -8,6 +8,7 @@ namespace Voxel {
 	{
 
 		Ref<Scene> ActiveScene;
+		int GizmoType = -1;
 		// TODO: Allow asset selection
 		Entity CurrentContext;
 

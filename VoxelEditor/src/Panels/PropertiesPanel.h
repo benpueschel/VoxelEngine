@@ -17,6 +17,7 @@ namespace Voxel {
 			: m_State(state), Panel("Properties") { }
 
 		virtual void OnImGuiRender() override;
+		virtual void OnUpdate(Timestep& timestep) override;
 		virtual void OnEvent(Event& event) override;
 
 		void Lock(bool locked) { m_Locked = locked; }

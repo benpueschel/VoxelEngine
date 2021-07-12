@@ -16,6 +16,7 @@ namespace Voxel {
 			: m_State(state), Panel("Scene Hierarchy") {}
 
 		virtual void OnImGuiRender() override;
+		virtual void OnUpdate(Timestep& timestep) override;
 		virtual void OnEvent(Event& event) override;
 
 	private:
