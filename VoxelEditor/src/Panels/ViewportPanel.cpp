@@ -15,13 +15,6 @@ namespace Voxel {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
 		m_Active = ImGui::Begin(GetImGuiID().c_str());
 
-		if (!m_Active)
-		{
-			ImGui::End();
-			ImGui::PopStyleVar();
-			return;
-		}
-
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 		auto viewportOffset = ImGui::GetWindowPos();
@@ -38,7 +31,7 @@ namespace Voxel {
 
 		// Gizmos
 		Entity& selectedEntity = m_State.CurrentContext;
-		if (selectedEntity && selectedEntity.HasComponent<TransformComponent>() && m_GizmoType != -1)
+		if (selectedEntity && selectedEntity.HasComponent<TransformComponent>() && m_State.GizmoType != -1)
 		{
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
@@ -46,15 +39,15 @@ namespace Voxel {
 			ImVec2 pos = ImGui::GetWindowPos();
 			ImVec2 size = ImGui::GetWindowSize();
 			ImGuizmo::SetRect(
-				m_ViewportBounds[0].x, m_ViewportBounds[0].y, 
-				m_ViewportBounds[1].x - m_ViewportBounds[0].x, 
+				m_ViewportBounds[0].x, m_ViewportBounds[0].y,
+				m_ViewportBounds[1].x - m_ViewportBounds[0].x,
 				m_ViewportBounds[1].y - m_ViewportBounds[0].y
 			);
 			const glm::mat4& view = m_Camera.GetViewMatrix();
 			const glm::mat4& projection = m_Camera.GetProjection();
 
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
-			glm::mat4& transform = tc.GetTransform();
+			glm::mat4 transform = tc.GetTransform();
 			glm::mat4 deltaTransform = transform;
 
 			glm::vec3 previousRotation = tc.LocalRotation;
@@ -63,13 +56,14 @@ namespace Voxel {
 
 			// Snapping
 			bool snap = Input::IsKeyPressed(KeyCode::LeftControl);
-			float snapValue = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? 45.0f : 0.5f;
+			float snapValue = m_State.GizmoType == ImGuizmo::OPERATION::ROTATE ? 45.0f : 0.5f;
 
 			float snapValues[3] = { snapValue, snapValue, snapValue };
+			ImGuizmo::OPERATION operation = static_cast<ImGuizmo::OPERATION>(m_State.GizmoType);
 
 			ImGuizmo::Manipulate(
 				glm::value_ptr(view), glm::value_ptr(projection),
-				static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::LOCAL,
+				operation, ImGuizmo::LOCAL,
 				glm::value_ptr(transform), nullptr, snap ? snapValues : nullptr
 			);
 
@@ -90,14 +84,42 @@ namespace Voxel {
 		ImGui::PopStyleVar();
 	}
 
+	void ViewportPanel::OnUpdate(Timestep& timestep)
+	{
+		if (!m_Active) return;
+
+		if (ShouldResize())
+		{
+			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_Camera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+		}
+		m_State.ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+
+		m_Framebuffer->Bind();
+
+		RenderCommand::SetClearColor({ 0.1f ,0.1f, 0.1f, 1.0f });
+		RenderCommand::Clear();
+
+		m_Framebuffer->ClearAttachment(1, -1);
+
+		if (m_Focused && !ImGuizmo::IsUsing())
+			m_Camera.OnUpdate(timestep);
+
+		m_State.ActiveScene->OnUpdateEditor(timestep, m_Camera);
+
+		m_Framebuffer->Unbind();
+	}
+
 	void ViewportPanel::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<WindowRestoreEvent>(BIND_EVENT_FN(ViewportPanel::OnWindowRestored));
+
 		if (m_Active)
 			dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(ViewportPanel::OnMouseButtonPressed));
 
-		m_Camera.OnEvent(event);
+		if(m_Active && m_Focused && !ImGuizmo::IsUsing())
+			m_Camera.OnEvent(event);
 	}
 
 	bool ViewportPanel::OnMouseButtonPressed(MouseButtonPressedEvent& event)

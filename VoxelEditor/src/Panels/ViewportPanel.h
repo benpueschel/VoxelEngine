@@ -32,6 +32,7 @@ namespace Voxel {
 		}
 
 		virtual void OnImGuiRender() override;
+		virtual void OnUpdate(Timestep& timestep) override;
 		virtual void OnEvent(Event& event) override;
 
 		bool OnWindowRestored(WindowRestoreEvent& event);
@@ -50,7 +51,6 @@ namespace Voxel {
 		bool m_Active = false;
 
 		EditorState& m_State;
-		int m_GizmoType = -1;
 
 		EditorCamera m_Camera;
 		Ref<Framebuffer> m_Framebuffer;

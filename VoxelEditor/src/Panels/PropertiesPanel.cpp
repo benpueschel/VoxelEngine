@@ -62,6 +62,11 @@ namespace Voxel {
 
 	}
 
+	void PropertiesPanel::OnUpdate(Timestep& timestep)
+	{
+
+	}
+
 	template<typename Component>
 	void PropertiesPanel::DrawComponent(const char* name, int treeNodeFlags, bool removable)
 	{

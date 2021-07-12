@@ -27,6 +27,12 @@ namespace Voxel {
 		ImGui::End();
 	}
 
+
+	void SceneHierarchyPanel::OnUpdate(Timestep& timestep)
+	{
+
+	}
+
 	void SceneHierarchyPanel::OnEvent(Event& event)
 	{
 

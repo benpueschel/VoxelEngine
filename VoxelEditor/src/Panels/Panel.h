@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Voxel/Events/Event.h"
+#include "Voxel/Core/Timestep.h"
 #include <string>
 
 namespace Voxel {
@@ -17,6 +18,7 @@ namespace Voxel {
 		virtual ~Panel() = default;
 
 		virtual void OnImGuiRender() = 0;
+		virtual void OnUpdate(Timestep& timestep) = 0;
 		virtual void OnEvent(Event& event) = 0;
 
 		const char*& GetName() { return m_Name; }
