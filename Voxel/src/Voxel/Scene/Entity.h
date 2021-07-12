@@ -42,7 +42,7 @@ namespace Voxel {
 		void GetComponents()
 		{
 			m_Scene->m_Registry.visit(m_EntityHandle, [&](const entt::type_info info) {
-				auto& component = m_Scene->m_Registry.get(m_EntityHandle);
+				//auto component = m_Scene->m_Registry.get(m_EntityHandle);
 				
 			});
 		}

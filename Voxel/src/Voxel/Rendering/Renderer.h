@@ -24,7 +24,7 @@ namespace Voxel {
 		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
 
-		void Renderer::Submit(Entity& entity);
+		void Submit(Entity& entity);
 		static void Submit(
 			Entity& entity,
 			const Ref<Shader>& shader,

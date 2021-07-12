@@ -20,6 +20,7 @@ namespace Voxel {
 
 		glm::mat4 GetTransform();
 
+		operator glm::mat4 () { return GetTransform(); }
 		operator glm::mat4& () { return GetTransform(); }
 
 		void OnImGuiRender();

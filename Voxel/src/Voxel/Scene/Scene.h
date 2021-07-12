@@ -32,8 +32,8 @@ namespace Voxel {
 		void SetSavePath(const std::filesystem::path& savePath) { m_SavePath = savePath; }
 		std::filesystem::path& GetSavePath() { return m_SavePath; }
 
-		static Ref<Scene>& Scene::LoadScene(const std::string& path);
-		static Ref<Scene>& Scene::SampleScene();
+		static Ref<Scene>& LoadScene(const std::string& path);
+		static Ref<Scene>& SampleScene();
 	private:
 		entt::registry m_Registry;
 		std::string m_Name;
