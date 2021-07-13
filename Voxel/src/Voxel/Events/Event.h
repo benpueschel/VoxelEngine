@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Voxel/Core/Core.h"
+#include <string>
 
 namespace Voxel {
 
