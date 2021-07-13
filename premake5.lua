@@ -20,7 +20,6 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
 
-	include "vendor/premake"
 	include "Voxel/vendor/glfw"
 	include "Voxel/vendor/GLAD"
 	include "Voxel/vendor/ImGui"
@@ -32,4 +31,4 @@ group ""
 include "Voxel"
 include "VoxelEditor"
 -- include "Sandbox"
-include "VulkanTest"
+-- include "VulkanTest"
