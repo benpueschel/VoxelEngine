@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "Panels/ContentBrowserPanel.h"
 #include "Panels/PropertiesPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/ViewportPanel.h"
@@ -26,10 +27,12 @@ namespace Voxel {
 		auto propertiesPanel = CreateRef<PropertiesPanel>(m_EditorState);
 		auto sceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_EditorState);
 		auto viewportPanel = CreateRef<ViewportPanel>(m_EditorState);
+		auto contentBrowserPanel = CreateRef<ContentBrowserPanel>(m_EditorState);
 
 		m_Panels.push_back(sceneHierarchyPanel);
 		m_Panels.push_back(propertiesPanel);
 		m_Panels.push_back(viewportPanel);
+		m_Panels.push_back(contentBrowserPanel);
 	}
 
 	void EditorLayer::OnDetach()
@@ -218,6 +221,8 @@ namespace Voxel {
 						m_Panels.push_back(CreateRef<SceneHierarchyPanel>(m_EditorState));
 					if (ImGui::MenuItem("Viewport"))
 						m_Panels.push_back(CreateRef<ViewportPanel>(m_EditorState));
+					if (ImGui::MenuItem("Content Browser"))
+						m_Panels.push_back(CreateRef<ContentBrowserPanel>(m_EditorState));
 
 					ImGui::EndMenu();
 				}
