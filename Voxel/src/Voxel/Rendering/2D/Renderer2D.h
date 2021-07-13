@@ -19,6 +19,9 @@ namespace Voxel {
 		static void EndScene();
 		static void Flush();
 
+		static void StartBatch();
+		static void NextBatch();
+
 		static void DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& spriteRenderer, int entityID);
 		// Primitive Submitting
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);

@@ -28,15 +28,8 @@ namespace Voxel {
 		LOG_CORE_INFO("  Renderer: {0}", glad_glGetString(GL_RENDERER));
 		LOG_CORE_INFO("  Version: {0}", glad_glGetString(GL_VERSION));
 
-	#ifdef ENABLE_ASSERTS
-		int versionMajor;
-		int versionMinor;
-
-		glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
-		glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
-
-		CORE_ASSERT((versionMajor > 4 || (versionMajor == 4 && versionMinor >= 5)), "Engine requires at least OpenGL version 4.5!");
-	#endif
+		CORE_ASSERT((GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5)), 
+			"OpenGL Versioon >= 4.5 required");
 	}
 
 	void OpenGLContext::SwapBuffers()

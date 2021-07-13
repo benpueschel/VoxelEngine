@@ -1,6 +1,7 @@
 #include <pch.h>
 #include "Renderer2D.h"
 
+#include "Voxel/Rendering/Shaders/UniformBuffer.h"
 #include "Voxel/Rendering/Shaders/VertexArray.h"
 #include "Voxel/Rendering/Shaders/Shader.h"
 #include "Voxel/Rendering/RenderCommand.h"
@@ -21,9 +22,9 @@ namespace Voxel {
 
 	struct RenderData2D
 	{
-		const uint32_t MaxQuads = 10000;
-		const uint32_t MaxVertices = MaxQuads * 4;
-		const uint32_t MaxIndices = MaxQuads * 6;
+		static const uint32_t MaxQuads = 10000;
+		static const uint32_t MaxVertices = MaxQuads * 4;
+		static const uint32_t MaxIndices = MaxQuads * 6;
 		static const uint32_t MaxTextureSlots = 32;
 
 		Ref<VertexArray> QuadVertexArray;
@@ -37,13 +38,20 @@ namespace Voxel {
 
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 1; // 0 = white texture
-		glm::vec4 QuadVertexPositions[4]
+		const glm::vec4 QuadVertexPositions[4]
 		{
 			{ -0.5f, -0.5f, 0.0f, 1.0f },
 			{  0.5f, -0.5f, 0.0f, 1.0f },
 			{  0.5f,  0.5f, 0.0f, 1.0f },
 			{ -0.5f,  0.5f, 0.0f, 1.0f }
 		};
+
+		struct CameraData
+		{
+			glm::mat4 ViewProjection;
+		};
+		CameraData CameraBuffer;
+		Ref<UniformBuffer> CameraUniformBuffer;
 
 		struct Statistics
 		{
@@ -103,33 +111,27 @@ namespace Voxel {
 		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
 		s_Data.TextureShader = Shader::Create("assets/shaders/2DTextureShader.glsl");
-		s_Data.TextureShader->Bind();
-
-		int32_t samplers[s_Data.MaxTextureSlots];
-		for (int i = 0; i < s_Data.MaxTextureSlots; i++)
-			samplers[i] = i;
-
-		s_Data.TextureShader->SetIntArray("u_Textures", samplers, s_Data.MaxTextureSlots);
 
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
+
+		s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(RenderData2D::CameraData), 0);
 	}
 
 	void Renderer2D::Shutdown()
 	{
 		PROFILE_FUNCTION();
+
+		delete[] s_Data.QuadVertexBufferBase;
 	}
 
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
 		PROFILE_FUNCTION();
 
-		s_Data.TextureShader->Bind();
-		s_Data.TextureShader->SetMat4("u_ViewProjection", camera.GetProjection() * glm::inverse(transform));
+		s_Data.CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(RenderData2D::CameraData));
 
-		s_Data.QuadIndexCount = 0;
-		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-
-		s_Data.TextureSlotIndex = 1;
+		StartBatch();
 	}
 
 
@@ -137,32 +139,47 @@ namespace Voxel {
 	{
 		PROFILE_FUNCTION();
 
-		s_Data.TextureShader->Bind();
-		s_Data.TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjection());
+		s_Data.CameraBuffer.ViewProjection = camera.GetViewProjection();
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(RenderData2D::CameraData));
 
-		s_Data.QuadIndexCount = 0;
-		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-
-		s_Data.TextureSlotIndex = 1;
+		StartBatch();
 	}
 
 	void Renderer2D::EndScene()
 	{
 		PROFILE_FUNCTION();
 
-		uint32_t dataSize = (uint8_t*) s_Data.QuadVertexBufferPtr - (uint8_t*) s_Data.QuadVertexBufferBase;
-		s_Data.QuadVertexBuffer->UploadData(s_Data.QuadVertexBufferBase, dataSize);
-
 		Flush();
+	}
+
+	void Renderer2D::StartBatch()
+	{
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+		s_Data.TextureSlotIndex = 1;
 	}
 
 	void Renderer2D::Flush()
 	{
+		if (s_Data.QuadIndexCount == 0) return; // Nothing to draw
+
+		s_Data.QuadVertexArray->Bind();
+		s_Data.TextureShader->Bind();
+		
+		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
+		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
+
 		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-		{
 			s_Data.TextureSlots[i]->Bind(i);
-		}
+
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+	}
+
+	void Renderer2D::NextBatch()
+	{
+		Flush();
+		StartBatch();
 	}
 
 	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteRendererComponent& spriteRenderer, int entityID)
@@ -185,27 +202,28 @@ namespace Voxel {
 		PROFILE_FUNCTION();
 
 		constexpr size_t quadVertexCount = 4;
-		constexpr glm::vec2 textureCoords[] = 
-		{ 
-			{ 0.0f, 0.0f },
-			{ 1.0f, 0.0f }, 
-			{ 1.0f, 1.0f }, 
-			{ 0.0f, 1.0f }
-		};
 		int textureIndex = 0;
+		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+
+		if (s_Data.QuadIndexCount >= RenderData2D::MaxIndices)
+			NextBatch();
+
 		if (texture)
 		{
 			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 			{
-				if (*s_Data.TextureSlots[i].get() == *texture.get())
+				if (*s_Data.TextureSlots[i] == *texture)
 				{
-					textureIndex = s_Data.TextureSlotIndex;
+					textureIndex = (int) i;
 					break;
 				}
 			}
 
 			if (textureIndex == 0)
 			{
+				if (s_Data.TextureSlotIndex >= RenderData2D::MaxTextureSlots)
+					NextBatch();
+
 				textureIndex = s_Data.TextureSlotIndex;
 				s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
 				s_Data.TextureSlotIndex++;
@@ -227,14 +245,6 @@ namespace Voxel {
 		}
 
 		s_Data.QuadIndexCount += 6;
-
-		/*
-		texture->Bind();
-		s_Data.TextureShader->SetMat4("u_Transform", transform.GetTransform());
-		s_Data.TextureShader->SetFloat("u_Scale", texture->GetScale());
-
-		s_Data.QuadVertexArray->Bind();
-		RenderCommand::DrawIndexed(s_Data.QuadVertexArray); */
 	}
 
 }

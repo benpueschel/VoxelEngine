@@ -5,6 +5,32 @@
 
 namespace Voxel {
 
+	enum ShaderDataBaseType
+	{
+		INT,
+		FLOAT,
+		MATRIX,
+		BOOL
+	};
+
+	static ShaderDataBaseType BaseType(ShaderDataType type)
+	{
+		switch (type)
+		{
+			case ShaderDataType::Float:  return ShaderDataBaseType::FLOAT;
+			case ShaderDataType::Float2: return ShaderDataBaseType::FLOAT;
+			case ShaderDataType::Float3: return ShaderDataBaseType::FLOAT;
+			case ShaderDataType::Float4: return ShaderDataBaseType::FLOAT;
+			case ShaderDataType::Mat3x3: return ShaderDataBaseType::MATRIX;
+			case ShaderDataType::Mat4x4: return ShaderDataBaseType::MATRIX;
+			case ShaderDataType::Int:    return ShaderDataBaseType::INT;
+			case ShaderDataType::Int2:   return ShaderDataBaseType::INT;
+			case ShaderDataType::Int3:   return ShaderDataBaseType::INT;
+			case ShaderDataType::Int4:   return ShaderDataBaseType::INT;
+			case ShaderDataType::Bool:   return ShaderDataBaseType::BOOL;
+		}
+	}
+
 	static GLenum GLBaseType(ShaderDataType type)
 	{
 		switch (type)
@@ -70,29 +96,45 @@ namespace Voxel {
 		for (const auto& element : layout)
 		{
 			GLenum baseType = GLBaseType(element.Type);
-			switch (baseType)
+			switch (BaseType(element.Type))
 			{
-				case GL_INT:
+				case ShaderDataBaseType::INT:
+				case ShaderDataBaseType::BOOL:
 					glEnableVertexAttribArray(index);
 					glVertexAttribIPointer(
 						index,
 						element.GetComponentCount(),
-						GLBaseType(element.Type),
+						baseType,
 						layout.GetStride(),
 						(const void*)element.Offset
 					);
 					break;
 
-				default:
+				case ShaderDataBaseType::FLOAT:
 					glEnableVertexAttribArray(index);
 					glVertexAttribPointer(
 						index,
 						element.GetComponentCount(),
-						GLBaseType(element.Type),
+						baseType,
 						element.Normalized ? GL_TRUE : GL_FALSE,
 						layout.GetStride(),
 						(const void*)element.Offset
 					);
+					break;
+				case  ShaderDataBaseType::MATRIX:
+					uint8_t count = element.GetComponentCount();
+					for (uint8_t i = 0; i < count; i++)
+					{
+						glEnableVertexAttribArray(m_VertexBufferIndex);
+						glVertexAttribPointer(m_VertexBufferIndex,
+							count,
+							baseType,
+							element.Normalized ? GL_TRUE : GL_FALSE,
+							layout.GetStride(),
+							(const void*)(element.Offset + sizeof(float) * count * i));
+						glVertexAttribDivisor(m_VertexBufferIndex, 1);
+						m_VertexBufferIndex++;
+					}
 					break;
 			}
 			index++;
