@@ -1,7 +1,47 @@
 #pragma once
 
 #include "Voxel.h"
+
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
+#include <imgui_internal.h>
+
+namespace ImGui {
+
+	// from imgui_widgets.cpp:996
+	static bool TransparentImageButton(ImGuiID id, ImTextureID texture_id, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, const ImVec2& padding, const ImVec4& bg_col, const ImVec4& tint_col) 
+	{
+		ImGuiContext& g = *GImGui;
+		ImGuiWindow* window = GetCurrentWindow();
+		if (window->SkipItems)
+			return false;
+
+		ImGui::KeepAliveID(id);
+
+		const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size + padding * 2);
+		ItemSize(bb);
+		if (!ItemAdd(bb, id))
+			return false;
+
+		bool hovered, held;
+		bool pressed = ButtonBehavior(bb, id, &hovered, &held);
+
+		// Render
+		//const ImU32 col = GetColorU32((held && hovered) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
+		RenderNavHighlight(bb, id);
+
+		if (bg_col.w > 0.0f)
+		{
+			//RenderFrame(bb.Min, bb.Max, col, true, ImClamp((float)ImMin(padding.x, padding.y), 0.0f, g.Style.FrameRounding));
+			window->DrawList->AddRectFilled(bb.Min + padding, bb.Max - padding, GetColorU32(bg_col));
+		}
+
+		window->DrawList->AddImage(texture_id, bb.Min + padding, bb.Max - padding, uv0, uv1, GetColorU32(tint_col));
+
+		return pressed;
+	}
+
+}
 
 namespace Voxel::UI {
 
@@ -37,13 +77,13 @@ namespace Voxel::UI {
 		colors[ImGuiCol_TitleBgCollapsed] = { 0.25f, 0.255f, 0.251f, 1.0f };
 	}
 
-	static void DrawImageButton(Ref<Texture2D>& texture, glm::vec2& size, 
-		glm::vec4& buttonColor = glm::vec4(0.0f), glm::vec4& tintColor = glm::vec4(1.0f))
+	static bool ImageButton(const char* name, Ref<Texture2D>& texture, glm::vec2& size, 
+		ImVec4& buttonColor = ImVec4{ 0, 0, 0, 0 }, ImVec4& tintColor = ImVec4{ 1, 1, 1, 1 })
 	{
-		ImVec4 imButtonColor = { buttonColor.r, buttonColor.g, buttonColor.b, buttonColor.a };
-		ImVec4 imTintColor = { tintColor.r, tintColor.g, tintColor.b, tintColor.a };
-
-		ImGui::ImageButton((ImTextureID)texture->GetRendererID(), { size.x, size.y }, { 0, 1 }, { 1, 0 }, 0, imButtonColor, imTintColor);
+		return ImGui::TransparentImageButton(
+			ImGui::GetID(name), (ImTextureID)texture->GetRendererID(),
+			{ size.x, size.y }, { 0, 1 }, { 1, 0 }, { 0, 0 }, buttonColor, tintColor
+		);
 	}
 
 	static ImVec2 GetButtonSize(const char* label)

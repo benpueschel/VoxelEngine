@@ -33,7 +33,6 @@ namespace Voxel {
 		}
 
 		int columns = glm::max<int>(1, std::floor(ImGui::GetContentRegionAvail().x / s_ColumnWidth));
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { s_ColumnPadding, s_ColumnPadding });
 
 		ImGui::Columns(columns, 0, false);
 
@@ -43,9 +42,15 @@ namespace Voxel {
 			//std::string stem = entry.path().filename().stem().string();
 			std::string extension = entry.path().extension().string();
 
+			ImVec4 buttonColor = { 0, 0, 0, 0 };
+
+			if (m_SelectionContext == entry.path())
+				buttonColor = { 1, 1, 1, 0.1f };
+
 			if (entry.is_directory())
 			{
-				UI::DrawImageButton(GetFolderTexture(ToLowerCase(filename)), glm::vec2(s_ColumnWidth));
+				if (UI::ImageButton(filename.c_str(), GetFolderTexture(ToLowerCase(filename)), glm::vec2(s_ColumnWidth), buttonColor))
+					m_SelectionContext = entry.path();
 				
 				if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 					SetCurrentDirectory(entry.path());
@@ -54,7 +59,8 @@ namespace Voxel {
 			}
 			else
 			{
-				UI::DrawImageButton(GetFileTexture(ToLowerCase(extension)), glm::vec2(s_ColumnWidth));
+				if (UI::ImageButton(filename.c_str(), GetFileTexture(ToLowerCase(extension)), glm::vec2(s_ColumnWidth), buttonColor))
+					m_SelectionContext = entry.path();
 
 				//if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 				//	OpenFile(entry.path)
@@ -65,7 +71,6 @@ namespace Voxel {
 			ImGui::NextColumn();
 		}
 
-		ImGui::PopStyleVar();
 		ImGui::Columns(1);
 
 		ImGui::SliderFloat("Thumbnail Size", &s_ColumnWidth, 64.0f, 512.0f);
@@ -120,15 +125,19 @@ namespace Voxel {
 
 	Ref<Texture2D>& ContentBrowserPanel::GetFileTexture(const std::string& fileExtension)
 	{
-		if (fileExtension == "cpp")
+		if (fileExtension == ".cpp")
 			return m_Icons["cpp"];
-		else if (fileExtension == "cs")
+		if (fileExtension == ".h")
+			return m_Icons["h"];
+		if (fileExtension == ".hpp")
+			return m_Icons["hpp"];
+		if (fileExtension == ".cs")
 			return m_Icons["csharp"];
-		else if (fileExtension == "txt")
+		if (fileExtension == ".txt")
 			return m_Icons["document"];
-		else if (fileExtension == "ttf")
+		if (fileExtension == ".ttf")
 			return m_Icons["font"];
-		else if (fileExtension == "fbx")
+		if (fileExtension == ".fbx")
 			return m_Icons["3d"];
 
 		return m_Icons["file"];
@@ -138,9 +147,9 @@ namespace Voxel {
 	{
 		if (folderName == "scripts")
 			return m_Icons["folder-scripts-open"];
-		else if (folderName == "settings")
+		if (folderName == "settings")
 			return m_Icons["folder-config-open"];
-		else if (folderName == "fonts")
+		if (folderName == "fonts")
 			return m_Icons["folder-font-open"];
 
 		return m_Icons["folder-open"];
