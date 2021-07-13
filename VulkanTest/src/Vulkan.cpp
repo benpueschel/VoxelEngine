@@ -8,7 +8,8 @@ using namespace Voxel;
 class VulkanApp : public Application
 {
 public:
-	VulkanApp()
+	VulkanApp(ApplicationCommandLineArgs args)
+		: Application("Vulkan Test", args)
 	{
 		LOG_INFO("Sandbox Application loading");
 		PushLayer(new VulkanRenderLayer());
@@ -20,7 +21,7 @@ public:
 
 };
 
-Application* Voxel::CreateApplication()
+Application* Voxel::CreateApplication(ApplicationCommandLineArgs args)
 {
-	return new VulkanApp();
+	return new VulkanApp(args);
 }

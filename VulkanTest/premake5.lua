@@ -13,12 +13,16 @@ project "VulkanTest"
 	}
 
 	includedirs {
-		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.spdlog}",
 		"%{wks.location}/Voxel/src",
 		"%{wks.location}/Voxel/vendor",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.ImTerm}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}",
+		"%{IncludeDir.VulkanSDK}"
 	}
 
 	links {
