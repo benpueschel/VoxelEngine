@@ -15,6 +15,13 @@ namespace Voxel {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
 		m_Active = ImGui::Begin(GetImGuiID().c_str());
 
+		if (!m_Active)
+		{
+			ImGui::End();
+			ImGui::PopStyleVar();
+			return;
+		}
+
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 		auto viewportOffset = ImGui::GetWindowPos();
@@ -113,7 +120,6 @@ namespace Voxel {
 	void ViewportPanel::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<WindowRestoreEvent>(BIND_EVENT_FN(ViewportPanel::OnWindowRestored));
 
 		if (m_Active)
 			dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(ViewportPanel::OnMouseButtonPressed));
@@ -152,13 +158,6 @@ namespace Voxel {
 		}
 
 		m_Framebuffer->Unbind();
-		return false;
-	}
-
-	bool ViewportPanel::OnWindowRestored(WindowRestoreEvent& event)
-	{
-		m_ViewportSize = { (float)event.GetWidth(), (float)event.GetHeight() };
-		m_Framebuffer->Resize(event.GetWidth(), event.GetHeight());
 		return false;
 	}
 

@@ -8,8 +8,8 @@ namespace Voxel {
 	class Voxel : public Application
 	{
 	public:
-		Voxel()
-			: Application("VoxelEditor")
+		Voxel(ApplicationCommandLineArgs args)
+			: Application("VoxelEditor", args)
 		{
 			PushLayer(new EditorLayer());
 		}
@@ -21,9 +21,9 @@ namespace Voxel {
 
 	};
 
-	Application* CreateApplication()
+	Application* CreateApplication(ApplicationCommandLineArgs args)
 	{
-		return new Voxel();
+		return new Voxel(args);
 	}
 
 }
