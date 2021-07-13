@@ -37,6 +37,15 @@ namespace Voxel::UI {
 		colors[ImGuiCol_TitleBgCollapsed] = { 0.25f, 0.255f, 0.251f, 1.0f };
 	}
 
+	static void DrawImageButton(Ref<Texture2D>& texture, glm::vec2& size, 
+		glm::vec4& buttonColor = glm::vec4(0.0f), glm::vec4& tintColor = glm::vec4(1.0f))
+	{
+		ImVec4 imButtonColor = { buttonColor.r, buttonColor.g, buttonColor.b, buttonColor.a };
+		ImVec4 imTintColor = { tintColor.r, tintColor.g, tintColor.b, tintColor.a };
+
+		ImGui::ImageButton((ImTextureID)texture->GetRendererID(), { size.x, size.y }, { 0, 1 }, { 1, 0 }, 0, imButtonColor, imTintColor);
+	}
+
 	static ImVec2 GetButtonSize(const char* label)
 	{
 		ImVec2 labelSize = ImGui::CalcTextSize(label, nullptr, true);

@@ -22,7 +22,10 @@ namespace Voxel {
 
 		void SetCurrentDirectory(const std::filesystem::path& directory);
 		void FetchDirectoryEntries();
+		void LoadIcons(std::filesystem::path& directory);
 
+		Ref<Texture2D>& ContentBrowserPanel::GetFileTexture(const std::string& fileExtension);
+		Ref<Texture2D>& ContentBrowserPanel::GetFolderTexture(const std::string& folderName);
 	private:
 		EditorState& m_State;
 		
@@ -33,6 +36,7 @@ namespace Voxel {
 		std::vector<std::filesystem::directory_entry> m_DirectoryEntries;
 		Timer m_DirectoryRefreshTimer;
 
+		std::map<std::string, Ref<Texture2D>> m_Icons;
 	};
 
 }
